@@ -363,7 +363,7 @@ abstract class AppLocalizations {
   /// No description provided for @reEntry.
   ///
   /// In en, this message translates to:
-  /// **'Re Entry'**
+  /// **'Vacation & Re Entry'**
   String get reEntry;
 
   /// No description provided for @workwear.
@@ -429,7 +429,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterEmployeeId.
   ///
   /// In en, this message translates to:
-  /// **'Enter Employee ID'**
+  /// **'Enter Worker /Employee ID'**
   String get enterEmployeeId;
 
   /// No description provided for @enterPassword.
@@ -449,6 +449,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Log In'**
   String get logIn;
+
+  /// No description provided for @forgotPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Forgot Password?'**
+  String get forgotPassword;
+
+  /// No description provided for @forgotPasswordMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your Worker / Employee ID and we\'ll send you instructions to reset your password.'**
+  String get forgotPasswordMessage;
+
+  /// No description provided for @requestPasswordReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Password Reset'**
+  String get requestPasswordReset;
+
+  /// No description provided for @passwordResetRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset request submitted.'**
+  String get passwordResetRequested;
 
   /// No description provided for @start.
   ///
@@ -480,6 +504,24 @@ abstract class AppLocalizations {
   /// **'Good Morning'**
   String get goodMorning;
 
+  /// No description provided for @goodAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Afternoon'**
+  String get goodAfternoon;
+
+  /// No description provided for @goodEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Evening'**
+  String get goodEvening;
+
+  /// No description provided for @goodNight.
+  ///
+  /// In en, this message translates to:
+  /// **'Good Night'**
+  String get goodNight;
+
   /// No description provided for @workDays.
   ///
   /// In en, this message translates to:
@@ -510,6 +552,18 @@ abstract class AppLocalizations {
   /// **'Current Location'**
   String get currentLocation;
 
+  /// No description provided for @locating.
+  ///
+  /// In en, this message translates to:
+  /// **'Locating…'**
+  String get locating;
+
+  /// No description provided for @locationUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Location unavailable'**
+  String get locationUnavailable;
+
   /// No description provided for @present.
   ///
   /// In en, this message translates to:
@@ -539,6 +593,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you ready to start your work session for today?'**
   String get startWorkMessage;
+
+  /// No description provided for @stopWork.
+  ///
+  /// In en, this message translates to:
+  /// **'Stop Work'**
+  String get stopWork;
+
+  /// No description provided for @stopWorkMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to stop your work session for today?'**
+  String get stopWorkMessage;
+
+  /// No description provided for @signature.
+  ///
+  /// In en, this message translates to:
+  /// **'Signature'**
+  String get signature;
+
+  /// No description provided for @signHere.
+  ///
+  /// In en, this message translates to:
+  /// **'Please sign below to confirm'**
+  String get signHere;
+
+  /// No description provided for @submit.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get submit;
+
+  /// No description provided for @clear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clear;
 
   /// No description provided for @no.
   ///
@@ -719,6 +809,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'WhatsApp Number'**
   String get whatsAppNumber;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @approved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approved;
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @noHistoryFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No history found'**
+  String get noHistoryFound;
+
+  /// No description provided for @leaveType.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave Type'**
+  String get leaveType;
+
+  /// No description provided for @selectLeaveType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select leave type'**
+  String get selectLeaveType;
+
+  /// No description provided for @sickLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Sick Leave'**
+  String get sickLeave;
+
+  /// No description provided for @personalLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Leave'**
+  String get personalLeave;
+
+  /// No description provided for @workwearType.
+  ///
+  /// In en, this message translates to:
+  /// **'Workwear Type'**
+  String get workwearType;
+
+  /// No description provided for @selectWorkwearType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select workwear type'**
+  String get selectWorkwearType;
+
+  /// No description provided for @shirtTShirt.
+  ///
+  /// In en, this message translates to:
+  /// **'Shirt / T-Shirt'**
+  String get shirtTShirt;
+
+  /// No description provided for @trouser.
+  ///
+  /// In en, this message translates to:
+  /// **'Trouser'**
+  String get trouser;
+
+  /// No description provided for @shoe.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoe'**
+  String get shoe;
+
+  /// No description provided for @jersey.
+  ///
+  /// In en, this message translates to:
+  /// **'Jersey'**
+  String get jersey;
+
+  /// No description provided for @winterJacket.
+  ///
+  /// In en, this message translates to:
+  /// **'Winter Jacket'**
+  String get winterJacket;
+
+  /// No description provided for @size.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get size;
+
+  /// No description provided for @selectSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Select size'**
+  String get selectSize;
+
+  /// No description provided for @shoeSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Shoe Size'**
+  String get shoeSize;
+
+  /// No description provided for @enterShoeSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter shoe size'**
+  String get enterShoeSize;
+
+  /// No description provided for @reEntryDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Re Entry'**
+  String get reEntryDocument;
+
+  /// No description provided for @flightTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'Flight Tickets'**
+  String get flightTickets;
+
+  /// No description provided for @imagePreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Image Preview'**
+  String get imagePreview;
+
+  /// No description provided for @pdfDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'PDF Document'**
+  String get pdfDocument;
+
+  /// No description provided for @reEntryDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Re Entry Date'**
+  String get reEntryDate;
 }
 
 class _AppLocalizationsDelegate

@@ -7,6 +7,7 @@ import '../../bloc/login/login_state.dart';
 import '../../core/responsive.dart';
 import '../../l10n/app_localizations.dart';
 import '../../app.dart';
+import 'widgets/forgot_password_dialog.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -132,13 +133,35 @@ class _LoginViewState extends State<_LoginView> {
                           ),
                         ),
                         SizedBox(width: context.sp(10)),
-                        Text(
-                          l.rememberMe,
-                          style: GoogleFonts.poppins(
-                            fontSize: context.sp(14),
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF191C21),
-                            letterSpacing: 0,
+                        Expanded(
+                          child: Text(
+                            l.rememberMe,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              fontSize: context.sp(14),
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF191C21),
+                              letterSpacing: 0,
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: context.sp(8)),
+                        GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () => showForgotPasswordDialog(context),
+                          child: Text(
+                            l.forgotPassword,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: GoogleFonts.poppins(
+                              fontSize: context.sp(13),
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF354E48),
+                              decoration: TextDecoration.underline,
+                              decorationColor: const Color(0xFF354E48),
+                              letterSpacing: 0,
+                            ),
                           ),
                         ),
                       ],

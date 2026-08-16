@@ -135,7 +135,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get leave => 'නිවාඩු';
 
   @override
-  String get reEntry => 'නැවත ඇතුල්වීම';
+  String get reEntry => 'නිවාඩු සහ නැවත ඇතුල්වීම';
 
   @override
   String get workwear => 'වැඩ ඇඳුම්';
@@ -168,7 +168,7 @@ class AppLocalizationsSi extends AppLocalizations {
   String get employeeLogging => 'සේවක පිවිසීම';
 
   @override
-  String get enterEmployeeId => 'සේවක ID ඇතුළු කරන්න';
+  String get enterEmployeeId => 'කම්කරු/සේවක ID ඇතුළු කරන්න';
 
   @override
   String get enterPassword => 'මුරපදය ඇතුළු කරන්න';
@@ -178,6 +178,20 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get logIn => 'පිළිසෙන්න';
+
+  @override
+  String get forgotPassword => 'මුරපදය අමතකද?';
+
+  @override
+  String get forgotPasswordMessage =>
+      'ඔබගේ කම්කරු/සේවක ID ඇතුළු කරන්න, අපි ඔබට මුරපදය යළි සකසීමේ උපදෙස් එවන්නෙමු.';
+
+  @override
+  String get requestPasswordReset => 'මුරපදය යළි සැකසීමට ඉල්ලන්න';
+
+  @override
+  String get passwordResetRequested =>
+      'මුරපදය යළි සැකසීමේ ඉල්ලීම ඉදිරිපත් කරන ලදී.';
 
   @override
   String get start => 'ආරම්භ කරන්න';
@@ -195,6 +209,15 @@ class AppLocalizationsSi extends AppLocalizations {
   String get goodMorning => 'සුභ උදැසනක්';
 
   @override
+  String get goodAfternoon => 'සුභ දහවලක්';
+
+  @override
+  String get goodEvening => 'සුභ සැන්දෑවක්';
+
+  @override
+  String get goodNight => 'සුබ රාත්‍රියක්';
+
+  @override
   String get workDays => 'වැඩ දින';
 
   @override
@@ -210,6 +233,12 @@ class AppLocalizationsSi extends AppLocalizations {
   String get currentLocation => 'වර්තමාන ස්තානය';
 
   @override
+  String get locating => 'ස්ථානය සොයමින්…';
+
+  @override
+  String get locationUnavailable => 'ස්ථානය නොමැත';
+
+  @override
   String get present => 'පැමිණියේය';
 
   @override
@@ -223,6 +252,25 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get startWorkMessage => 'ඔබ අද වැඩ ආරම්භ කිරීමට සූදානම්ද?';
+
+  @override
+  String get stopWork => 'වැඩ නවත්වන්න';
+
+  @override
+  String get stopWorkMessage =>
+      'ඔබට අද වැඩ සැසිය නැවැත්වීමට අවශ්‍ය බව විශ්වාසද?';
+
+  @override
+  String get signature => 'අත්සන';
+
+  @override
+  String get signHere => 'තහවුරු කිරීමට කරුණාකර පහත අත්සන් කරන්න';
+
+  @override
+  String get submit => 'ඉදිරිපත් කරන්න';
+
+  @override
+  String get clear => 'මකන්න';
 
   @override
   String get no => 'නැහැ';
@@ -314,4 +362,76 @@ class AppLocalizationsSi extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'WhatsApp අංකය';
+
+  @override
+  String get pending => 'විසඳෙමින්';
+
+  @override
+  String get approved => 'අනුමත කළා';
+
+  @override
+  String get rejected => 'ප්‍රතික්ෂේප කළා';
+
+  @override
+  String get noHistoryFound => 'ඉතිහාසයක් හමු නොවීය';
+
+  @override
+  String get leaveType => 'නිවාඩු වර්ගය';
+
+  @override
+  String get selectLeaveType => 'නිවාඩු වර්ගය තෝරන්න';
+
+  @override
+  String get sickLeave => 'අසනීප නිවාඩු';
+
+  @override
+  String get personalLeave => 'පෞද්ගලික නිවාඩු';
+
+  @override
+  String get workwearType => 'වැඩ ඇඳුම් වර්ගය';
+
+  @override
+  String get selectWorkwearType => 'වැඩ ඇඳුම් වර්ගය තෝරන්න';
+
+  @override
+  String get shirtTShirt => 'ෂර්ට් / ටී ෂර්ට්';
+
+  @override
+  String get trouser => 'කලිසම';
+
+  @override
+  String get shoe => 'සපත්තු';
+
+  @override
+  String get jersey => 'ජර්සි';
+
+  @override
+  String get winterJacket => 'ශීත ජැකට්ටුව';
+
+  @override
+  String get size => 'ප්‍රමාණය';
+
+  @override
+  String get selectSize => 'ප්‍රමාණය තෝරන්න';
+
+  @override
+  String get shoeSize => 'සපත්තු ප්‍රමාණය';
+
+  @override
+  String get enterShoeSize => 'සපත්තු ප්‍රමාණය ඇතුළු කරන්න';
+
+  @override
+  String get reEntryDocument => 'නැවත ඇතුල්වීම';
+
+  @override
+  String get flightTickets => 'ගුවන් ටිකට්';
+
+  @override
+  String get imagePreview => 'රූප පෙරදසුන';
+
+  @override
+  String get pdfDocument => 'PDF ලේඛනය';
+
+  @override
+  String get reEntryDate => 'නැවත ඇතුල්වීමේ දිනය';
 }

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart';
 import '../../bloc/home/home_bloc.dart';
 import '../../bloc/home/home_event.dart';
 import '../../bloc/home/home_state.dart';
@@ -10,8 +9,10 @@ import '../../l10n/app_localizations.dart';
 import 'widgets/greeting_card.dart';
 import 'widgets/info_cards.dart';
 import 'widgets/recent_log_list.dart';
-import 'widgets/week_calendar.dart';
+// import 'widgets/week_calendar.dart';
 import 'widgets/start_work_dialog.dart';
+import 'widgets/signature_dialog.dart';
+import 'widgets/israel_clock_row.dart';
 
 const _kRed = Color(0xFFBF3847);
 const _kDark = Color(0xFF242F31);
@@ -22,12 +23,9 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
-    final locale = Localizations.localeOf(context).languageCode;
 
     return BlocBuilder<HomeBloc, HomeState>(
       builder: (context, state) {
-        final monthYear = DateFormat('MMMM y', locale).format(state.selectedDate);
-
         return ColoredBox(
           color: const Color(0xFFF5F0E8),
           child: SingleChildScrollView(
@@ -74,47 +72,13 @@ class HomeScreen extends StatelessWidget {
 
                 SizedBox(height: context.sp(8)),
 
-                // ── Month / time row ────────────────────────────────
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: context.sp(16)),
-                  child: Row(
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            monthYear,
-                            style: GoogleFonts.poppins(
-                              fontSize: context.sp(13),
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFF191C21),
-                              letterSpacing: 0,
-                            ),
-                          ),
-                          SizedBox(width: context.sp(3)),
-                          Icon(Icons.keyboard_arrow_down,
-                              size: context.sp(17),
-                              color: const Color(0xFF191C21)),
-                        ],
-                      ),
-                      const Spacer(),
-                      Text(
-                        '07.00 PM',
-                        style: GoogleFonts.poppins(
-                          fontSize: context.sp(13),
-                          fontWeight: FontWeight.w600,
-                          color: const Color(0xFF191C21),
-                          letterSpacing: 0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // ── Date / time row (live Israel time) ──────────────
+                const IsraelClockRow(),
 
                 SizedBox(height: context.sp(4)),
 
                 // ── Week calendar ───────────────────────────────────
-                const WeekCalendar(),
-
+                // const WeekCalendar(),
                 SizedBox(height: context.sp(8)),
 
                 // ── Info cards (unified panel) ──────────────────────
@@ -131,36 +95,47 @@ class HomeScreen extends StatelessWidget {
                   child: state.isTracking
                       ? _TrackingRow(
                           elapsedSeconds: state.elapsedSeconds,
-                          onStop: () => context
-                              .read<HomeBloc>()
-                              .add(const HomeTrackingToggled()),
+                          onStop: () async {
+                            final confirmed = await showStopWorkDialog(context);
+                            if (confirmed == true && context.mounted) {
+                              // Signature is optional — the session ends
+                              // whether or not the user signs.
+                              await showSignatureDialog(context);
+                              if (context.mounted) {
+                                context.read<HomeBloc>().add(
+                                  const HomeTrackingToggled(),
+                                );
+                              }
+                            }
+                          },
                         )
                       : Center(
                           child: SizedBox(
                             width: context.wp(46),
                             height: context.sp(38),
                             child: DecoratedBox(
-                              decoration:
-                                  const BoxDecoration(color: _kDark),
+                              decoration: const BoxDecoration(color: _kDark),
                               child: Material(
                                 color: Colors.transparent,
                                 child: InkWell(
                                   onTap: () async {
-                                    final confirmed =
-                                        await showStartWorkDialog(context);
-                                    if (confirmed == true &&
-                                        context.mounted) {
+                                    final confirmed = await showStartWorkDialog(
+                                      context,
+                                    );
+                                    if (confirmed == true && context.mounted) {
                                       context.read<HomeBloc>().add(
-                                          const HomeTrackingToggled());
+                                        const HomeTrackingToggled(),
+                                      );
                                     }
                                   },
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Icon(Icons.timer_outlined,
-                                          color: Colors.white,
-                                          size: context.sp(16)),
+                                      Icon(
+                                        Icons.timer_outlined,
+                                        color: Colors.white,
+                                        size: context.sp(16),
+                                      ),
                                       SizedBox(width: context.sp(6)),
                                       Text(
                                         l.start,
@@ -303,8 +278,11 @@ class _TrackingRow extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(Icons.stop_rounded,
-                            color: Colors.white, size: context.sp(16)),
+                        Icon(
+                          Icons.stop_rounded,
+                          color: Colors.white,
+                          size: context.sp(16),
+                        ),
                         SizedBox(width: context.sp(5)),
                         Text(
                           l.stop,

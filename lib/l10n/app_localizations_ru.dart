@@ -135,7 +135,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get leave => 'Отпуск';
 
   @override
-  String get reEntry => 'Повторный въезд';
+  String get reEntry => 'Отпуск и повторный въезд';
 
   @override
   String get workwear => 'Рабочая одежда';
@@ -168,7 +168,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get employeeLogging => 'Вход сотрудника';
 
   @override
-  String get enterEmployeeId => 'Введите ID сотрудника';
+  String get enterEmployeeId => 'Введите ID работника/сотрудника';
 
   @override
   String get enterPassword => 'Введите пароль';
@@ -178,6 +178,19 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get logIn => 'Войти';
+
+  @override
+  String get forgotPassword => 'Забыли пароль?';
+
+  @override
+  String get forgotPasswordMessage =>
+      'Введите ваш ID работника/сотрудника, и мы вышлем вам инструкции по сбросу пароля.';
+
+  @override
+  String get requestPasswordReset => 'Запросить сброс пароля';
+
+  @override
+  String get passwordResetRequested => 'Запрос на сброс пароля отправлен.';
 
   @override
   String get start => 'Начать';
@@ -195,6 +208,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get goodMorning => 'Доброе утро';
 
   @override
+  String get goodAfternoon => 'Добрый день';
+
+  @override
+  String get goodEvening => 'Добрый вечер';
+
+  @override
+  String get goodNight => 'Спокойной ночи';
+
+  @override
   String get workDays => 'РАБ. ДНИ';
 
   @override
@@ -210,6 +232,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get currentLocation => 'Текущее местоположение';
 
   @override
+  String get locating => 'Определение местоположения…';
+
+  @override
+  String get locationUnavailable => 'Местоположение недоступно';
+
+  @override
   String get present => 'Присутствует';
 
   @override
@@ -223,6 +251,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get startWorkMessage => 'Вы готовы начать рабочий день?';
+
+  @override
+  String get stopWork => 'Закончить работу';
+
+  @override
+  String get stopWorkMessage =>
+      'Вы уверены, что хотите закончить рабочую сессию на сегодня?';
+
+  @override
+  String get signature => 'Подпись';
+
+  @override
+  String get signHere => 'Пожалуйста, распишитесь ниже для подтверждения';
+
+  @override
+  String get submit => 'Отправить';
+
+  @override
+  String get clear => 'Очистить';
 
   @override
   String get no => 'Нет';
@@ -314,4 +361,76 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'Номер WhatsApp';
+
+  @override
+  String get pending => 'В ожидании';
+
+  @override
+  String get approved => 'Одобрено';
+
+  @override
+  String get rejected => 'Отклонено';
+
+  @override
+  String get noHistoryFound => 'История не найдена';
+
+  @override
+  String get leaveType => 'Тип отпуска';
+
+  @override
+  String get selectLeaveType => 'Выберите тип отпуска';
+
+  @override
+  String get sickLeave => 'Больничный';
+
+  @override
+  String get personalLeave => 'Личный отпуск';
+
+  @override
+  String get workwearType => 'Тип спецодежды';
+
+  @override
+  String get selectWorkwearType => 'Выберите тип спецодежды';
+
+  @override
+  String get shirtTShirt => 'Рубашка / Футболка';
+
+  @override
+  String get trouser => 'Брюки';
+
+  @override
+  String get shoe => 'Обувь';
+
+  @override
+  String get jersey => 'Джерси';
+
+  @override
+  String get winterJacket => 'Зимняя куртка';
+
+  @override
+  String get size => 'Размер';
+
+  @override
+  String get selectSize => 'Выберите размер';
+
+  @override
+  String get shoeSize => 'Размер обуви';
+
+  @override
+  String get enterShoeSize => 'Введите размер обуви';
+
+  @override
+  String get reEntryDocument => 'Повторный въезд';
+
+  @override
+  String get flightTickets => 'Авиабилеты';
+
+  @override
+  String get imagePreview => 'Просмотр изображения';
+
+  @override
+  String get pdfDocument => 'PDF документ';
+
+  @override
+  String get reEntryDate => 'Дата повторного въезда';
 }

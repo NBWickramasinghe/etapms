@@ -135,7 +135,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get leave => 'إجازة';
 
   @override
-  String get reEntry => 'إعادة الدخول';
+  String get reEntry => 'إجازة وإعادة الدخول';
 
   @override
   String get workwear => 'ملابس العمل';
@@ -168,7 +168,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get employeeLogging => 'تسجيل دخول الموظف';
 
   @override
-  String get enterEmployeeId => 'أدخل رقم الموظف';
+  String get enterEmployeeId => 'أدخل رقم العامل/الموظف';
 
   @override
   String get enterPassword => 'أدخل كلمة المرور';
@@ -178,6 +178,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logIn => 'دخول';
+
+  @override
+  String get forgotPassword => 'نسيت كلمة المرور؟';
+
+  @override
+  String get forgotPasswordMessage =>
+      'أدخل رقم العامل / الموظف الخاص بك وسنرسل لك تعليمات لإعادة تعيين كلمة المرور.';
+
+  @override
+  String get requestPasswordReset => 'طلب إعادة تعيين كلمة المرور';
+
+  @override
+  String get passwordResetRequested => 'تم إرسال طلب إعادة تعيين كلمة المرور.';
 
   @override
   String get start => 'بدء';
@@ -195,6 +208,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get goodMorning => 'صباح الخير';
 
   @override
+  String get goodAfternoon => 'نهارك سعيد';
+
+  @override
+  String get goodEvening => 'مساء الخير';
+
+  @override
+  String get goodNight => 'تصبح على خير';
+
+  @override
   String get workDays => 'أيام العمل';
 
   @override
@@ -210,6 +232,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get currentLocation => 'الموقع الحالي';
 
   @override
+  String get locating => 'جارٍ تحديد الموقع…';
+
+  @override
+  String get locationUnavailable => 'الموقع غير متاح';
+
+  @override
   String get present => 'حاضر';
 
   @override
@@ -223,6 +251,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get startWorkMessage => 'هل أنت مستعد لبدء جلسة عمل اليوم؟';
+
+  @override
+  String get stopWork => 'إيقاف العمل';
+
+  @override
+  String get stopWorkMessage => 'هل أنت متأكد أنك تريد إنهاء جلسة عمل اليوم؟';
+
+  @override
+  String get signature => 'التوقيع';
+
+  @override
+  String get signHere => 'يرجى التوقيع أدناه للتأكيد';
+
+  @override
+  String get submit => 'إرسال';
+
+  @override
+  String get clear => 'مسح';
 
   @override
   String get no => 'لا';
@@ -314,4 +360,76 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'رقم واتساب';
+
+  @override
+  String get pending => 'قيد الانتظار';
+
+  @override
+  String get approved => 'تمت الموافقة';
+
+  @override
+  String get rejected => 'مرفوض';
+
+  @override
+  String get noHistoryFound => 'لم يتم العثور على سجل';
+
+  @override
+  String get leaveType => 'نوع الإجازة';
+
+  @override
+  String get selectLeaveType => 'اختر نوع الإجازة';
+
+  @override
+  String get sickLeave => 'إجازة مرضية';
+
+  @override
+  String get personalLeave => 'إجازة شخصية';
+
+  @override
+  String get workwearType => 'نوع ملابس العمل';
+
+  @override
+  String get selectWorkwearType => 'اختر نوع ملابس العمل';
+
+  @override
+  String get shirtTShirt => 'قميص / تي شيرت';
+
+  @override
+  String get trouser => 'بنطلون';
+
+  @override
+  String get shoe => 'حذاء';
+
+  @override
+  String get jersey => 'قميص رياضي';
+
+  @override
+  String get winterJacket => 'سترة شتوية';
+
+  @override
+  String get size => 'المقاس';
+
+  @override
+  String get selectSize => 'اختر المقاس';
+
+  @override
+  String get shoeSize => 'مقاس الحذاء';
+
+  @override
+  String get enterShoeSize => 'أدخل مقاس الحذاء';
+
+  @override
+  String get reEntryDocument => 'إعادة الدخول';
+
+  @override
+  String get flightTickets => 'تذاكر الطيران';
+
+  @override
+  String get imagePreview => 'معاينة الصورة';
+
+  @override
+  String get pdfDocument => 'مستند PDF';
+
+  @override
+  String get reEntryDate => 'تاريخ إعادة الدخول';
 }

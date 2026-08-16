@@ -135,7 +135,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get leave => 'ลา';
 
   @override
-  String get reEntry => 'กลับเข้าประเทศ';
+  String get reEntry => 'วันหยุดและกลับเข้าประเทศ';
 
   @override
   String get workwear => 'ชุดทำงาน';
@@ -168,7 +168,7 @@ class AppLocalizationsTh extends AppLocalizations {
   String get employeeLogging => 'การเข้าสู่ระบบพนักงาน';
 
   @override
-  String get enterEmployeeId => 'ป้อนรหัสพนักงาน';
+  String get enterEmployeeId => 'ป้อนรหัสคนงาน/พนักงาน';
 
   @override
   String get enterPassword => 'ป้อนรหัสผ่าน';
@@ -178,6 +178,19 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get logIn => 'เข้าสู่ระบบ';
+
+  @override
+  String get forgotPassword => 'ลืมรหัสผ่าน?';
+
+  @override
+  String get forgotPasswordMessage =>
+      'กรอกรหัสคนงาน/พนักงานของคุณ แล้วเราจะส่งคำแนะนำในการรีเซ็ตรหัสผ่านให้คุณ';
+
+  @override
+  String get requestPasswordReset => 'ขอรีเซ็ตรหัสผ่าน';
+
+  @override
+  String get passwordResetRequested => 'ส่งคำขอรีเซ็ตรหัสผ่านแล้ว';
 
   @override
   String get start => 'เริ่ม';
@@ -195,6 +208,15 @@ class AppLocalizationsTh extends AppLocalizations {
   String get goodMorning => 'อรุณสวัสดิ์';
 
   @override
+  String get goodAfternoon => 'สวัสดีตอนบ่าย';
+
+  @override
+  String get goodEvening => 'สวัสดีตอนเย็น';
+
+  @override
+  String get goodNight => 'ราตรีสวัสดิ์';
+
+  @override
   String get workDays => 'วันทำงาน';
 
   @override
@@ -210,6 +232,12 @@ class AppLocalizationsTh extends AppLocalizations {
   String get currentLocation => 'ตำแหน่งปัจจุบัน';
 
   @override
+  String get locating => 'กำลังค้นหาตำแหน่ง…';
+
+  @override
+  String get locationUnavailable => 'ไม่พบตำแหน่ง';
+
+  @override
   String get present => 'มาทำงาน';
 
   @override
@@ -223,6 +251,25 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get startWorkMessage => 'คุณพร้อมที่จะเริ่มการทำงานวันนี้หรือยัง?';
+
+  @override
+  String get stopWork => 'หยุดทำงาน';
+
+  @override
+  String get stopWorkMessage =>
+      'คุณแน่ใจหรือไม่ว่าต้องการหยุดเซสชันการทำงานของวันนี้?';
+
+  @override
+  String get signature => 'ลายเซ็น';
+
+  @override
+  String get signHere => 'กรุณาลงลายเซ็นด้านล่างเพื่อยืนยัน';
+
+  @override
+  String get submit => 'ส่ง';
+
+  @override
+  String get clear => 'ล้าง';
 
   @override
   String get no => 'ไม่';
@@ -314,4 +361,76 @@ class AppLocalizationsTh extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'หมายเลข WhatsApp';
+
+  @override
+  String get pending => 'รอดำเนินการ';
+
+  @override
+  String get approved => 'อนุมัติแล้ว';
+
+  @override
+  String get rejected => 'ถูกปฏิเสธ';
+
+  @override
+  String get noHistoryFound => 'ไม่พบประวัติ';
+
+  @override
+  String get leaveType => 'ประเภทการลา';
+
+  @override
+  String get selectLeaveType => 'เลือกประเภทการลา';
+
+  @override
+  String get sickLeave => 'ลาป่วย';
+
+  @override
+  String get personalLeave => 'ลากิจส่วนตัว';
+
+  @override
+  String get workwearType => 'ประเภทชุดทำงาน';
+
+  @override
+  String get selectWorkwearType => 'เลือกประเภทชุดทำงาน';
+
+  @override
+  String get shirtTShirt => 'เสื้อเชิ้ต / เสื้อยืด';
+
+  @override
+  String get trouser => 'กางเกง';
+
+  @override
+  String get shoe => 'รองเท้า';
+
+  @override
+  String get jersey => 'เสื้อกีฬา';
+
+  @override
+  String get winterJacket => 'แจ็คเก็ตกันหนาว';
+
+  @override
+  String get size => 'ขนาด';
+
+  @override
+  String get selectSize => 'เลือกขนาด';
+
+  @override
+  String get shoeSize => 'ขนาดรองเท้า';
+
+  @override
+  String get enterShoeSize => 'กรอกขนาดรองเท้า';
+
+  @override
+  String get reEntryDocument => 'กลับเข้าประเทศ';
+
+  @override
+  String get flightTickets => 'ตั๋วเครื่องบิน';
+
+  @override
+  String get imagePreview => 'ตัวอย่างรูปภาพ';
+
+  @override
+  String get pdfDocument => 'เอกสาร PDF';
+
+  @override
+  String get reEntryDate => 'วันที่กลับเข้าประเทศ';
 }

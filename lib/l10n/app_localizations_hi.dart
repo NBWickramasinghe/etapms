@@ -135,7 +135,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get leave => 'अवकाश';
 
   @override
-  String get reEntry => 'पुनः प्रवेश';
+  String get reEntry => 'छुट्टी और पुनः प्रवेश';
 
   @override
   String get workwear => 'कार्य वस्त्र';
@@ -168,7 +168,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get employeeLogging => 'कर्मचारी लॉगिन';
 
   @override
-  String get enterEmployeeId => 'कर्मचारी ID दर्ज करें';
+  String get enterEmployeeId => 'श्रमिक/कर्मचारी ID दर्ज करें';
 
   @override
   String get enterPassword => 'पासवर्ड दर्ज करें';
@@ -178,6 +178,19 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get logIn => 'लॉग इन करें';
+
+  @override
+  String get forgotPassword => 'पासवर्ड भूल गए?';
+
+  @override
+  String get forgotPasswordMessage =>
+      'अपना श्रमिक/कर्मचारी ID दर्ज करें और हम आपको पासवर्ड रीसेट करने के निर्देश भेजेंगे।';
+
+  @override
+  String get requestPasswordReset => 'पासवर्ड रीसेट का अनुरोध करें';
+
+  @override
+  String get passwordResetRequested => 'पासवर्ड रीसेट अनुरोध सबमिट किया गया।';
 
   @override
   String get start => 'शुरू करें';
@@ -195,6 +208,15 @@ class AppLocalizationsHi extends AppLocalizations {
   String get goodMorning => 'सुप्रभात';
 
   @override
+  String get goodAfternoon => 'शुभ दोपहर';
+
+  @override
+  String get goodEvening => 'शुभ संध्या';
+
+  @override
+  String get goodNight => 'शुभ रात्रि';
+
+  @override
   String get workDays => 'कार्य दिवस';
 
   @override
@@ -208,6 +230,12 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get currentLocation => 'वर्तमान स्थान';
+
+  @override
+  String get locating => 'स्थान ढूंढ रहे हैं…';
+
+  @override
+  String get locationUnavailable => 'स्थान उपलब्ध नहीं है';
 
   @override
   String get present => 'उपस्थित';
@@ -224,6 +252,25 @@ class AppLocalizationsHi extends AppLocalizations {
   @override
   String get startWorkMessage =>
       'क्या आप आज का काम शुरू करने के लिए तैयार हैं?';
+
+  @override
+  String get stopWork => 'काम बंद करें';
+
+  @override
+  String get stopWorkMessage =>
+      'क्या आप वाकई आज का काम सत्र समाप्त करना चाहते हैं?';
+
+  @override
+  String get signature => 'हस्ताक्षर';
+
+  @override
+  String get signHere => 'पुष्टि के लिए नीचे हस्ताक्षर करें';
+
+  @override
+  String get submit => 'सबमिट करें';
+
+  @override
+  String get clear => 'साफ़ करें';
 
   @override
   String get no => 'नहीं';
@@ -315,4 +362,76 @@ class AppLocalizationsHi extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'WhatsApp नंबर';
+
+  @override
+  String get pending => 'लंबित';
+
+  @override
+  String get approved => 'स्वीकृत';
+
+  @override
+  String get rejected => 'अस्वीकृत';
+
+  @override
+  String get noHistoryFound => 'कोई इतिहास नहीं मिला';
+
+  @override
+  String get leaveType => 'अवकाश प्रकार';
+
+  @override
+  String get selectLeaveType => 'अवकाश प्रकार चुनें';
+
+  @override
+  String get sickLeave => 'बीमारी अवकाश';
+
+  @override
+  String get personalLeave => 'व्यक्तिगत अवकाश';
+
+  @override
+  String get workwearType => 'कार्य पोशाक प्रकार';
+
+  @override
+  String get selectWorkwearType => 'कार्य पोशाक प्रकार चुनें';
+
+  @override
+  String get shirtTShirt => 'शर्ट / टी-शर्ट';
+
+  @override
+  String get trouser => 'ट्राउज़र';
+
+  @override
+  String get shoe => 'जूता';
+
+  @override
+  String get jersey => 'जर्सी';
+
+  @override
+  String get winterJacket => 'विंटर जैकेट';
+
+  @override
+  String get size => 'साइज़';
+
+  @override
+  String get selectSize => 'साइज़ चुनें';
+
+  @override
+  String get shoeSize => 'जूते का साइज़';
+
+  @override
+  String get enterShoeSize => 'जूते का साइज़ दर्ज करें';
+
+  @override
+  String get reEntryDocument => 'पुनः प्रवेश';
+
+  @override
+  String get flightTickets => 'फ्लाइट टिकट';
+
+  @override
+  String get imagePreview => 'छवि पूर्वावलोकन';
+
+  @override
+  String get pdfDocument => 'PDF दस्तावेज़';
+
+  @override
+  String get reEntryDate => 'पुनः प्रवेश तिथि';
 }

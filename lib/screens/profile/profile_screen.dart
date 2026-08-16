@@ -49,15 +49,17 @@ class _ProfileView extends StatelessWidget {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () => Navigator.of(context).pop(),
-                          child: Container(
+                          child: SizedBox(
                             width: context.sp(40),
                             height: context.sp(40),
-                            color: _kDark,
-                            child: Icon(
-                              Icons.arrow_back,
-                              color: Colors.white,
-                              size: context.sp(20),
+                            child: Center(
+                              child: Icon(
+                                Icons.arrow_back,
+                                color: _kText,
+                                size: context.sp(20),
+                              ),
                             ),
                           ),
                         ),

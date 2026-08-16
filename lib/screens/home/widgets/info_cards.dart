@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../../../bloc/location/location_cubit.dart';
+import '../../../bloc/location/location_state.dart';
 import '../../../core/responsive.dart';
 import '../../../l10n/app_localizations.dart';
+import 'live_location_map.dart';
 
 const _kAsh = Color(0xFFB0BAC5);
 const _kRed = Color(0xFFBF3847);
@@ -12,19 +16,22 @@ class InfoCardsPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: _kBg,
-        borderRadius: BorderRadius.circular(context.sp(8)),
-      ),
-      child: Column(
-        children: [
-          _LocationSection(),
-          _Divider(),
-          _StatsSection(),
-          _Divider(),
-          _CurrentLocationSection(),
-        ],
+    return BlocProvider(
+      create: (_) => LocationCubit(),
+      child: Container(
+        decoration: BoxDecoration(
+          color: _kBg,
+          borderRadius: BorderRadius.circular(context.sp(8)),
+        ),
+        child: Column(
+          children: [
+            _LocationSection(),
+            _Divider(),
+            _StatsSection(),
+            _Divider(),
+            _CurrentLocationSection(),
+          ],
+        ),
       ),
     );
   }
@@ -242,46 +249,52 @@ class _CurrentLocationSection extends StatelessWidget {
         children: [
           _RedIcon(Icons.my_location),
           SizedBox(width: context.sp(12)),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text(
-                l.currentLocation,
-                style: GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: context.sp(14),
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l.currentLocation,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: context.sp(14),
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0,
+                  ),
                 ),
-              ),
-              Row(
-                children: [
-                  Text(
-                    'Zikim',
-                    style: GoogleFonts.poppins(
-                      color: _kAsh,
-                      fontSize: context.sp(10),
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  SizedBox(width: context.sp(12)),
-                  Text(
-                    '32°',
-                    style: GoogleFonts.poppins(
-                      color: _kAsh,
-                      fontSize: context.sp(10),
-                      letterSpacing: 0,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+                BlocBuilder<LocationCubit, LocationState>(
+                  builder: (context, state) {
+                    final text = switch (state.status) {
+                      LocationStatus.ready =>
+                        state.placeName ?? l.locating,
+                      LocationStatus.loading => l.locating,
+                      LocationStatus.denied ||
+                      LocationStatus.disabled ||
+                      LocationStatus.error =>
+                        l.locationUnavailable,
+                    };
+                    return Text(
+                      text,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.poppins(
+                        color: _kAsh,
+                        fontSize: context.sp(10),
+                        letterSpacing: 0,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
+          SizedBox(width: context.sp(8)),
           SizedBox(
             width: context.sp(62),
             height: context.sp(52),
-            child: CustomPaint(painter: _MapPainter()),
+            child: const LiveLocationMap(),
           ),
         ],
       ),
@@ -311,50 +324,4 @@ class _Divider extends StatelessWidget {
       thickness: 1,
     );
   }
-}
-
-// ── Map Painter ───────────────────────────────────────────────────────────────
-
-class _MapPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = const Color(0xFF2A3D38),
-    );
-
-    final roadMain = Paint()
-      ..color = const Color(0xFF1A2A26)
-      ..strokeWidth = 6
-      ..style = PaintingStyle.stroke;
-
-    final roadSub = Paint()
-      ..color = const Color(0xFF243430)
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke;
-
-    final block = Paint()..color = const Color(0xFF2E4540);
-
-    canvas.drawRect(Rect.fromLTWH(3, 3, size.width * 0.24, size.height * 0.30), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.34, 3, size.width * 0.32, size.height * 0.30), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.74, 3, size.width * 0.24, size.height * 0.30), block);
-    canvas.drawRect(Rect.fromLTWH(3, size.height * 0.40, size.width * 0.24, size.height * 0.26), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.34, size.height * 0.40, size.width * 0.32, size.height * 0.26), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.74, size.height * 0.40, size.width * 0.24, size.height * 0.26), block);
-    canvas.drawRect(Rect.fromLTWH(3, size.height * 0.72, size.width * 0.24, size.height * 0.26), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.34, size.height * 0.72, size.width * 0.32, size.height * 0.26), block);
-    canvas.drawRect(Rect.fromLTWH(size.width * 0.74, size.height * 0.72, size.width * 0.24, size.height * 0.26), block);
-
-    canvas.drawLine(Offset(0, size.height * 0.34), Offset(size.width, size.height * 0.34), roadMain);
-    canvas.drawLine(Offset(0, size.height * 0.68), Offset(size.width, size.height * 0.68), roadSub);
-    canvas.drawLine(Offset(size.width * 0.30, 0), Offset(size.width * 0.30, size.height), roadSub);
-    canvas.drawLine(Offset(size.width * 0.70, 0), Offset(size.width * 0.70, size.height), roadSub);
-
-    final center = Offset(size.width * 0.50, size.height * 0.50);
-    canvas.drawCircle(center, 6, Paint()..color = _kRed);
-    canvas.drawCircle(center, 3, Paint()..color = Colors.white);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

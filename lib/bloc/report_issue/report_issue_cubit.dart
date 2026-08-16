@@ -15,6 +15,15 @@ class ReportIssueCubit extends Cubit<ReportIssueState> {
   void selectRequestType(RequestType type) =>
       emit(state.copyWith(selectedRequestType: type));
 
+  void selectLeaveType(LeaveType type) =>
+      emit(state.copyWith(selectedLeaveType: type));
+
+  void selectWorkwearType(WorkwearType type) =>
+      emit(state.copyWith(selectedWorkwearType: type));
+
+  void selectClothingSize(ClothingSize size) =>
+      emit(state.copyWith(selectedClothingSize: size));
+
   void selectIssueType(IssueType type) =>
       emit(state.copyWith(selectedIssueType: type));
 
@@ -29,8 +38,32 @@ class ReportIssueCubit extends Cubit<ReportIssueState> {
   void selectEndDate(DateTime date) =>
       emit(state.copyWith(endDate: date));
 
+  void selectReEntryDate(DateTime date) {
+    final startDate = state.startDate;
+    final endDate = state.endDate;
+    // The vacation start/end dates must fall between today and the
+    // re-entry date — if they no longer fit under the new re-entry date,
+    // clear them so an invalid range can't linger.
+    final startInvalid = startDate != null && startDate.isAfter(date);
+    final endInvalid = endDate != null && endDate.isAfter(date);
+    emit(state.copyWith(
+      reEntryDate: date,
+      clearStartDate: startInvalid,
+      clearEndDate: startInvalid || endInvalid,
+    ));
+  }
+
   Future<void> submitRequest(String reason) async {
-    if (state.startDate == null || state.endDate == null) {
+    final needsDates = state.selectedRequestType != RequestType.workwear;
+    final isReEntry = state.selectedRequestType == RequestType.reEntry;
+    if (isReEntry && state.reEntryDate == null) {
+      emit(state.copyWith(
+        status: ReportIssueStatus.failure,
+        errorMessage: 'Please select a re-entry date.',
+      ));
+      return;
+    }
+    if (needsDates && (state.startDate == null || state.endDate == null)) {
       emit(state.copyWith(
         status: ReportIssueStatus.failure,
         errorMessage: 'Please select start and end dates.',

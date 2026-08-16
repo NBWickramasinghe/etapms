@@ -135,7 +135,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get leave => '请假';
 
   @override
-  String get reEntry => '再入境';
+  String get reEntry => '休假与再入境';
 
   @override
   String get workwear => '工作服';
@@ -168,7 +168,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get employeeLogging => '员工登录';
 
   @override
-  String get enterEmployeeId => '输入员工ID';
+  String get enterEmployeeId => '输入工人/员工ID';
 
   @override
   String get enterPassword => '输入密码';
@@ -178,6 +178,18 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get logIn => '登录';
+
+  @override
+  String get forgotPassword => '忘记密码？';
+
+  @override
+  String get forgotPasswordMessage => '请输入您的工号/员工编号，我们将向您发送重置密码的说明。';
+
+  @override
+  String get requestPasswordReset => '申请重置密码';
+
+  @override
+  String get passwordResetRequested => '密码重置请求已提交。';
 
   @override
   String get start => '开始';
@@ -195,6 +207,15 @@ class AppLocalizationsZh extends AppLocalizations {
   String get goodMorning => '早上好';
 
   @override
+  String get goodAfternoon => '下午好';
+
+  @override
+  String get goodEvening => '晚上好';
+
+  @override
+  String get goodNight => '晚安';
+
+  @override
   String get workDays => '工作天数';
 
   @override
@@ -210,6 +231,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get currentLocation => '当前位置';
 
   @override
+  String get locating => '正在定位…';
+
+  @override
+  String get locationUnavailable => '无法获取位置';
+
+  @override
   String get present => '出勤';
 
   @override
@@ -223,6 +250,24 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get startWorkMessage => '您准备好开始今天的工作了吗？';
+
+  @override
+  String get stopWork => '停止工作';
+
+  @override
+  String get stopWorkMessage => '您确定要结束今天的工作了吗？';
+
+  @override
+  String get signature => '签名';
+
+  @override
+  String get signHere => '请在下方签名以确认';
+
+  @override
+  String get submit => '提交';
+
+  @override
+  String get clear => '清除';
 
   @override
   String get no => '否';
@@ -313,4 +358,76 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'WhatsApp号码';
+
+  @override
+  String get pending => '待处理';
+
+  @override
+  String get approved => '已批准';
+
+  @override
+  String get rejected => '已拒绝';
+
+  @override
+  String get noHistoryFound => '未找到历史记录';
+
+  @override
+  String get leaveType => '请假类型';
+
+  @override
+  String get selectLeaveType => '选择请假类型';
+
+  @override
+  String get sickLeave => '病假';
+
+  @override
+  String get personalLeave => '事假';
+
+  @override
+  String get workwearType => '工作服类型';
+
+  @override
+  String get selectWorkwearType => '选择工作服类型';
+
+  @override
+  String get shirtTShirt => '衬衫/T恤';
+
+  @override
+  String get trouser => '长裤';
+
+  @override
+  String get shoe => '鞋子';
+
+  @override
+  String get jersey => '运动衫';
+
+  @override
+  String get winterJacket => '冬季夹克';
+
+  @override
+  String get size => '尺码';
+
+  @override
+  String get selectSize => '选择尺码';
+
+  @override
+  String get shoeSize => '鞋码';
+
+  @override
+  String get enterShoeSize => '输入鞋码';
+
+  @override
+  String get reEntryDocument => '再入境';
+
+  @override
+  String get flightTickets => '机票';
+
+  @override
+  String get imagePreview => '图片预览';
+
+  @override
+  String get pdfDocument => 'PDF 文件';
+
+  @override
+  String get reEntryDate => '再入境日期';
 }

@@ -135,7 +135,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get leave => 'Leave';
 
   @override
-  String get reEntry => 'Re Entry';
+  String get reEntry => 'Vacation & Re Entry';
 
   @override
   String get workwear => 'Workwear';
@@ -168,7 +168,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get employeeLogging => 'Employee Logging';
 
   @override
-  String get enterEmployeeId => 'Enter Employee ID';
+  String get enterEmployeeId => 'Enter Worker /Employee ID';
 
   @override
   String get enterPassword => 'Enter Password';
@@ -178,6 +178,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logIn => 'Log In';
+
+  @override
+  String get forgotPassword => 'Forgot Password?';
+
+  @override
+  String get forgotPasswordMessage =>
+      'Enter your Worker / Employee ID and we\'ll send you instructions to reset your password.';
+
+  @override
+  String get requestPasswordReset => 'Request Password Reset';
+
+  @override
+  String get passwordResetRequested => 'Password reset request submitted.';
 
   @override
   String get start => 'Start';
@@ -195,6 +208,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goodMorning => 'Good Morning';
 
   @override
+  String get goodAfternoon => 'Good Afternoon';
+
+  @override
+  String get goodEvening => 'Good Evening';
+
+  @override
+  String get goodNight => 'Good Night';
+
+  @override
   String get workDays => 'WORK DAYS';
 
   @override
@@ -208,6 +230,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get currentLocation => 'Current Location';
+
+  @override
+  String get locating => 'Locating…';
+
+  @override
+  String get locationUnavailable => 'Location unavailable';
 
   @override
   String get present => 'Present';
@@ -224,6 +252,25 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get startWorkMessage =>
       'Are you ready to start your work session for today?';
+
+  @override
+  String get stopWork => 'Stop Work';
+
+  @override
+  String get stopWorkMessage =>
+      'Are you sure you want to stop your work session for today?';
+
+  @override
+  String get signature => 'Signature';
+
+  @override
+  String get signHere => 'Please sign below to confirm';
+
+  @override
+  String get submit => 'Submit';
+
+  @override
+  String get clear => 'Clear';
 
   @override
   String get no => 'No';
@@ -315,4 +362,76 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get whatsAppNumber => 'WhatsApp Number';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get approved => 'Approved';
+
+  @override
+  String get rejected => 'Rejected';
+
+  @override
+  String get noHistoryFound => 'No history found';
+
+  @override
+  String get leaveType => 'Leave Type';
+
+  @override
+  String get selectLeaveType => 'Select leave type';
+
+  @override
+  String get sickLeave => 'Sick Leave';
+
+  @override
+  String get personalLeave => 'Personal Leave';
+
+  @override
+  String get workwearType => 'Workwear Type';
+
+  @override
+  String get selectWorkwearType => 'Select workwear type';
+
+  @override
+  String get shirtTShirt => 'Shirt / T-Shirt';
+
+  @override
+  String get trouser => 'Trouser';
+
+  @override
+  String get shoe => 'Shoe';
+
+  @override
+  String get jersey => 'Jersey';
+
+  @override
+  String get winterJacket => 'Winter Jacket';
+
+  @override
+  String get size => 'Size';
+
+  @override
+  String get selectSize => 'Select size';
+
+  @override
+  String get shoeSize => 'Shoe Size';
+
+  @override
+  String get enterShoeSize => 'Enter shoe size';
+
+  @override
+  String get reEntryDocument => 'Re Entry';
+
+  @override
+  String get flightTickets => 'Flight Tickets';
+
+  @override
+  String get imagePreview => 'Image Preview';
+
+  @override
+  String get pdfDocument => 'PDF Document';
+
+  @override
+  String get reEntryDate => 'Re Entry Date';
 }

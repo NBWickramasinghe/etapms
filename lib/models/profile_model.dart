@@ -29,12 +29,12 @@ class ProfileModel {
 
   // Hardcoded dummy data — replace with API response later
   static const dummy = ProfileModel(
-    employeeNo: 'SDI546382',
+    employeeNo: '44',
     joinedDate: '23 Sep 2020',
     country: 'Sri Lanka',
     position: 'Employee',
     surname: 'Dulaj',
-    otherName: 'Kosala',
+    otherName: 'Koshala',
     birthday: '12 Apr 1994',
     passportNo: '2342934298394299',
     email: 'dulaj@gmail.com',

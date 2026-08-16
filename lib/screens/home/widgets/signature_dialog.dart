@@ -1,34 +1,20 @@
 import 'dart:math' as math;
+import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:signature/signature.dart';
 import '../../../core/responsive.dart';
 import '../../../l10n/app_localizations.dart';
 
-Future<bool?> showStartWorkDialog(BuildContext context) {
-  final l = AppLocalizations.of(context)!;
-  return _showConfirmDialog(
-    context,
-    title: l.startWork,
-    message: l.startWorkMessage,
-  );
-}
+const _kRed = Color(0xFFBF3847);
+const _kDark = Color(0xFF242F31);
 
-Future<bool?> showStopWorkDialog(BuildContext context) {
-  final l = AppLocalizations.of(context)!;
-  return _showConfirmDialog(
-    context,
-    title: l.stopWork,
-    message: l.stopWorkMessage,
-  );
-}
-
-Future<bool?> _showConfirmDialog(
-  BuildContext context, {
-  required String title,
-  required String message,
-}) {
-  return showGeneralDialog<bool>(
+/// Shows the signature pad dialog. Resolves with the signed PNG bytes if the
+/// user submits a signature, or `null` if the dialog is dismissed/closed
+/// without signing.
+Future<Uint8List?> showSignatureDialog(BuildContext context) {
+  return showGeneralDialog<Uint8List?>(
     context: context,
     barrierDismissible: true,
     barrierLabel: 'Dismiss',
@@ -45,16 +31,12 @@ Future<bool?> _showConfirmDialog(
         ),
       );
     },
-    pageBuilder: (context, _, _) =>
-        _ConfirmDialogPage(title: title, message: message),
+    pageBuilder: (context, _, _) => const _SignatureDialogPage(),
   );
 }
 
-class _ConfirmDialogPage extends StatelessWidget {
-  final String title;
-  final String message;
-
-  const _ConfirmDialogPage({required this.title, required this.message});
+class _SignatureDialogPage extends StatelessWidget {
+  const _SignatureDialogPage();
 
   @override
   Widget build(BuildContext context) {
@@ -63,28 +45,58 @@ class _ConfirmDialogPage extends StatelessWidget {
       child: Container(
         color: Colors.black.withValues(alpha: 0.25),
         child: Center(
-          child: _DialogContent(title: title, message: message),
+          child: _SignatureDialogContent(),
         ),
       ),
     );
   }
 }
 
-class _DialogContent extends StatelessWidget {
-  final String title;
-  final String message;
+class _SignatureDialogContent extends StatefulWidget {
+  @override
+  State<_SignatureDialogContent> createState() =>
+      _SignatureDialogContentState();
+}
 
-  const _DialogContent({required this.title, required this.message});
+class _SignatureDialogContentState extends State<_SignatureDialogContent> {
+  late final SignatureController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = SignatureController(
+      penStrokeWidth: 2.5,
+      penColor: _kDark,
+      exportBackgroundColor: Colors.white,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_controller.isEmpty) {
+      Navigator.of(context).pop();
+      return;
+    }
+    final bytes = await _controller.toPngBytes();
+    if (mounted) Navigator.of(context).pop(bytes);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final screen = MediaQuery.sizeOf(context);
     // Cap the card so it never sprawls edge-to-edge in landscape, and cap
-    // its height so it always fits short landscape viewports — the body
-    // scrolls internally instead of overflowing the screen.
-    final maxWidth = math.min(420.0, screen.width * 0.88);
+    // its height so it always fits short landscape viewports. The pad
+    // itself shrinks with the viewport instead of staying a fixed height
+    // that could overflow the dialog.
+    final maxWidth = math.min(460.0, screen.width * 0.9);
     final maxHeight = screen.height * 0.85;
+    final padHeight = (screen.height * 0.24).clamp(110.0, 220.0);
 
     return Center(
       child: ConstrainedBox(
@@ -104,46 +116,86 @@ class _DialogContent extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // ── Title ──────────────────────────────────
+                      // ── Header: title + close button ────────────
                       Padding(
                         padding: EdgeInsets.fromLTRB(
                           context.sp(20),
-                          context.sp(28),
-                          context.sp(20),
+                          context.sp(18),
                           context.sp(12),
+                          0,
                         ),
-                        child: Text(
-                          title,
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: context.sp(16),
-                            fontWeight: FontWeight.w700,
-                            color: const Color(0xFF191C21),
-                            letterSpacing: 0,
-                            decoration: TextDecoration.none,
-                          ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                l.signature,
+                                style: GoogleFonts.poppins(
+                                  fontSize: context.sp(16),
+                                  fontWeight: FontWeight.w700,
+                                  color: const Color(0xFF191C21),
+                                  letterSpacing: 0,
+                                  decoration: TextDecoration.none,
+                                ),
+                              ),
+                            ),
+                            GestureDetector(
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => Navigator.of(context).pop(),
+                              child: Padding(
+                                padding: EdgeInsets.all(context.sp(6)),
+                                child: Icon(
+                                  Icons.close,
+                                  size: context.sp(20),
+                                  color: const Color(0xFF6B7280),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
 
-                      // ── Body ───────────────────────────────────
+                      SizedBox(height: context.sp(4)),
+
+                      // ── Instruction text ─────────────────────────
                       Padding(
                         padding:
                             EdgeInsets.symmetric(horizontal: context.sp(20)),
                         child: Text(
-                          message,
-                          textAlign: TextAlign.center,
+                          l.signHere,
                           style: GoogleFonts.poppins(
                             fontSize: context.sp(13),
                             fontWeight: FontWeight.w400,
                             color: const Color(0xFF242F31),
-                            height: 1.5,
+                            height: 1.4,
                             letterSpacing: 0,
                             decoration: TextDecoration.none,
                           ),
                         ),
                       ),
 
-                      SizedBox(height: context.sp(28)),
+                      SizedBox(height: context.sp(14)),
+
+                      // ── Signature pad ──────────────────────────
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: context.sp(20)),
+                        child: Container(
+                          height: padHeight,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5F0E8),
+                            borderRadius:
+                                BorderRadius.circular(context.sp(10)),
+                            border: Border.all(color: Colors.grey.shade300),
+                          ),
+                          clipBehavior: Clip.antiAlias,
+                          child: Signature(
+                            controller: _controller,
+                            backgroundColor: Colors.transparent,
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: context.sp(20)),
                     ],
                   ),
                 ),
@@ -158,7 +210,7 @@ class _DialogContent extends StatelessWidget {
                   children: [
                     Expanded(
                       child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(false),
+                        onPressed: () => _controller.clear(),
                         style: TextButton.styleFrom(
                           padding:
                               EdgeInsets.symmetric(vertical: context.sp(14)),
@@ -169,11 +221,11 @@ class _DialogContent extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          l.no,
+                          l.clear,
                           style: GoogleFonts.poppins(
                             fontSize: context.sp(14),
                             fontWeight: FontWeight.w600,
-                            color: const Color(0xFF242F31),
+                            color: _kRed,
                             letterSpacing: 0,
                             decoration: TextDecoration.none,
                           ),
@@ -187,7 +239,7 @@ class _DialogContent extends StatelessWidget {
                     ),
                     Expanded(
                       child: TextButton(
-                        onPressed: () => Navigator.of(context).pop(true),
+                        onPressed: _submit,
                         style: TextButton.styleFrom(
                           padding:
                               EdgeInsets.symmetric(vertical: context.sp(14)),
@@ -198,11 +250,11 @@ class _DialogContent extends StatelessWidget {
                           ),
                         ),
                         child: Text(
-                          l.yes,
+                          l.submit,
                           style: GoogleFonts.poppins(
                             fontSize: context.sp(14),
                             fontWeight: FontWeight.w700,
-                            color: const Color(0xFF242F31),
+                            color: _kDark,
                             letterSpacing: 0,
                             decoration: TextDecoration.none,
                           ),

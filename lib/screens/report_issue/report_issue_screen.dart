@@ -12,6 +12,14 @@ const _kGreen = Color(0xFF354E48);
 const _kText  = Color(0xFF191C21);
 const _kRed   = Color(0xFFBF3847);
 const _kBg    = Color(0xFFF5F0E8);
+const _kAmber = Color(0xFFD4882A);
+
+/// Today's date with the time stripped — so "today" is always a valid
+/// pick regardless of the current time of day.
+DateTime _todayDate() {
+  final now = DateTime.now();
+  return DateTime(now.year, now.month, now.day);
+}
 
 class ReportIssueScreen extends StatelessWidget {
   const ReportIssueScreen({super.key});
@@ -35,11 +43,13 @@ class _ReportIssueView extends StatefulWidget {
 class _ReportIssueViewState extends State<_ReportIssueView> {
   final _reasonCtrl = TextEditingController();
   final _issueCtrl  = TextEditingController();
+  final _shoeSizeCtrl = TextEditingController();
 
   @override
   void dispose() {
     _reasonCtrl.dispose();
     _issueCtrl.dispose();
+    _shoeSizeCtrl.dispose();
     super.dispose();
   }
 
@@ -83,13 +93,15 @@ class _ReportIssueViewState extends State<_ReportIssueView> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
                           onTap: () => Navigator.of(context).pop(),
-                          child: Container(
+                          child: SizedBox(
                             width: context.sp(40),
                             height: context.sp(40),
-                            color: _kDark,
-                            child: Icon(Icons.arrow_back,
-                                color: Colors.white, size: context.sp(20)),
+                            child: Center(
+                              child: Icon(Icons.arrow_back,
+                                  color: _kText, size: context.sp(20)),
+                            ),
                           ),
                         ),
                       ),
@@ -120,22 +132,26 @@ class _ReportIssueViewState extends State<_ReportIssueView> {
                       horizontal: context.sp(20),
                       vertical: context.sp(16),
                     ),
-                    child: state.activeTab == ReportIssueTab.request
-                        ? _RequestContent(
-                            state: state,
-                            cubit: cubit,
-                            reasonCtrl: _reasonCtrl,
-                          )
-                        : _IssueContent(
-                            state: state,
-                            cubit: cubit,
-                            issueCtrl: _issueCtrl,
-                          ),
+                    child: switch (state.activeTab) {
+                      ReportIssueTab.request => _RequestContent(
+                          state: state,
+                          cubit: cubit,
+                          reasonCtrl: _reasonCtrl,
+                          shoeSizeCtrl: _shoeSizeCtrl,
+                        ),
+                      ReportIssueTab.issue => _IssueContent(
+                          state: state,
+                          cubit: cubit,
+                          issueCtrl: _issueCtrl,
+                        ),
+                      ReportIssueTab.history => const _HistoryContent(),
+                    },
                   ),
                 ),
 
                 // ── Error ────────────────────────────────────────
-                if (state.errorMessage.isNotEmpty)
+                if (state.activeTab != ReportIssueTab.history &&
+                    state.errorMessage.isNotEmpty)
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: context.sp(20)),
                     child: Text(
@@ -148,28 +164,31 @@ class _ReportIssueViewState extends State<_ReportIssueView> {
                     ),
                   ),
 
-                // ── Bottom Button ────────────────────────────────
-                Padding(
-                  padding: EdgeInsets.fromLTRB(
-                    context.sp(20),
-                    context.sp(8),
-                    context.sp(20),
-                    context.sp(16),
-                  ),
-                  child: _ActionButton(
-                    label: state.activeTab == ReportIssueTab.request
-                        ? l.request
-                        : l.reportIssue,
-                    isLoading: state.status == ReportIssueStatus.loading,
-                    onTap: () {
-                      if (state.activeTab == ReportIssueTab.request) {
-                        cubit.submitRequest(_reasonCtrl.text);
-                      } else {
-                        cubit.submitIssue(_issueCtrl.text);
-                      }
-                    },
-                  ),
-                ),
+                // ── Bottom Button (hidden on the History tab) ─────
+                if (state.activeTab != ReportIssueTab.history)
+                  Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      context.sp(20),
+                      context.sp(8),
+                      context.sp(20),
+                      context.sp(16),
+                    ),
+                    child: _ActionButton(
+                      label: state.activeTab == ReportIssueTab.request
+                          ? l.request
+                          : l.reportIssue,
+                      isLoading: state.status == ReportIssueStatus.loading,
+                      onTap: () {
+                        if (state.activeTab == ReportIssueTab.request) {
+                          cubit.submitRequest(_reasonCtrl.text);
+                        } else {
+                          cubit.submitIssue(_issueCtrl.text);
+                        }
+                      },
+                    ),
+                  )
+                else
+                  SizedBox(height: context.sp(16)),
               ],
             ),
           ),
@@ -201,6 +220,11 @@ class _TabRow extends StatelessWidget {
           label: l.issue,
           isSelected: activeTab == ReportIssueTab.issue,
           onTap: () => onTabSelected(ReportIssueTab.issue),
+        ),
+        _TabItem(
+          label: l.history,
+          isSelected: activeTab == ReportIssueTab.history,
+          onTap: () => onTabSelected(ReportIssueTab.history),
         ),
       ],
     );
@@ -255,11 +279,13 @@ class _RequestContent extends StatelessWidget {
   final ReportIssueState state;
   final ReportIssueCubit cubit;
   final TextEditingController reasonCtrl;
+  final TextEditingController shoeSizeCtrl;
 
   const _RequestContent({
     required this.state,
     required this.cubit,
     required this.reasonCtrl,
+    required this.shoeSizeCtrl,
   });
 
   @override
@@ -299,55 +325,149 @@ class _RequestContent extends StatelessWidget {
           ],
         ),
 
-        SizedBox(height: context.sp(20)),
+        if (state.selectedRequestType == RequestType.leave) ...[
+          SizedBox(height: context.sp(20)),
+          _LeaveTypeField(
+            value: state.selectedLeaveType,
+            onChanged: cubit.selectLeaveType,
+          ),
+        ],
 
-        Row(
-          children: [
-            Expanded(
-              child: _DateField(
-                label: l.startDate,
-                date: state.startDate,
-                onTap: () async {
-                  final d = await showDatePicker(
-                    context: context,
-                    initialDate: state.startDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime(2030),
-                    builder: (ctx, child) => _datePickerTheme(ctx, child),
-                  );
-                  if (d != null) cubit.selectStartDate(d);
-                },
+        if (state.selectedRequestType == RequestType.workwear) ...[
+          SizedBox(height: context.sp(20)),
+          _LabeledDropdown<WorkwearType>(
+            label: l.workwearType,
+            hint: l.selectWorkwearType,
+            value: state.selectedWorkwearType,
+            items: [
+              DropdownMenuItem(
+                value: WorkwearType.shirtTShirt,
+                child: Text(l.shirtTShirt),
               ),
+              DropdownMenuItem(
+                value: WorkwearType.trouser,
+                child: Text(l.trouser),
+              ),
+              DropdownMenuItem(
+                value: WorkwearType.shoe,
+                child: Text(l.shoe),
+              ),
+              DropdownMenuItem(
+                value: WorkwearType.jersey,
+                child: Text(l.jersey),
+              ),
+              DropdownMenuItem(
+                value: WorkwearType.winterJacket,
+                child: Text(l.winterJacket),
+              ),
+            ],
+            onChanged: cubit.selectWorkwearType,
+          ),
+          SizedBox(height: context.sp(16)),
+          if (state.selectedWorkwearType == WorkwearType.shoe)
+            _ShoeSizeField(controller: shoeSizeCtrl)
+          else
+            _LabeledDropdown<ClothingSize>(
+              label: l.size,
+              hint: l.selectSize,
+              value: state.selectedClothingSize,
+              items: const [
+                DropdownMenuItem(value: ClothingSize.s, child: Text('S')),
+                DropdownMenuItem(value: ClothingSize.m, child: Text('M')),
+                DropdownMenuItem(value: ClothingSize.l, child: Text('L')),
+                DropdownMenuItem(value: ClothingSize.xl, child: Text('XL')),
+                DropdownMenuItem(value: ClothingSize.xxl, child: Text('XXL')),
+              ],
+              onChanged: cubit.selectClothingSize,
             ),
-            SizedBox(width: context.sp(12)),
-            Expanded(
-              child: _DateField(
-                label: l.endDate,
-                date: state.endDate,
-                onTap: () async {
-                  final d = await showDatePicker(
-                    context: context,
-                    initialDate: state.endDate ??
-                        (state.startDate ?? DateTime.now()),
-                    firstDate: state.startDate ?? DateTime(2020),
-                    lastDate: DateTime(2030),
-                    builder: (ctx, child) => _datePickerTheme(ctx, child),
-                  );
-                  if (d != null) cubit.selectEndDate(d);
-                },
-              ),
+        ],
+
+        if (state.selectedRequestType != RequestType.workwear) ...[
+          if (state.selectedRequestType == RequestType.reEntry) ...[
+            SizedBox(height: context.sp(20)),
+            _DateField(
+              label: l.reEntryDate,
+              date: state.reEntryDate,
+              onTap: () async {
+                final today = _todayDate();
+                final d = await showDatePicker(
+                  context: context,
+                  initialDate: state.reEntryDate ?? today,
+                  // The re-entry date is always an upcoming date — never
+                  // in the past.
+                  firstDate: today,
+                  lastDate: DateTime(2030),
+                  builder: (ctx, child) => _datePickerTheme(ctx, child),
+                );
+                if (d != null) cubit.selectReEntryDate(d);
+              },
             ),
           ],
-        ),
 
-        if (state.startDate != null && state.endDate != null) ...[
-          SizedBox(height: context.sp(16)),
-          _DateSummaryCard(
-            startDate: state.startDate!,
-            endDate: state.endDate!,
-            leaveDays: state.leaveDays,
-            requestType: state.selectedRequestType,
+          SizedBox(height: context.sp(20)),
+
+          Row(
+            children: [
+              Expanded(
+                child: _DateField(
+                  label: l.startDate,
+                  date: state.startDate,
+                  onTap: () async {
+                    final today = _todayDate();
+                    // For Vacation & Re Entry, the start date must fall
+                    // between today and the chosen re-entry date.
+                    final maxSelectable =
+                        state.selectedRequestType == RequestType.reEntry
+                            ? (state.reEntryDate ?? DateTime(2030))
+                            : DateTime(2030);
+                    final d = await showDatePicker(
+                      context: context,
+                      initialDate: state.startDate ?? today,
+                      // Only today or upcoming dates can be picked as start.
+                      firstDate: today,
+                      lastDate: maxSelectable,
+                      builder: (ctx, child) => _datePickerTheme(ctx, child),
+                    );
+                    if (d != null) cubit.selectStartDate(d);
+                  },
+                ),
+              ),
+              SizedBox(width: context.sp(12)),
+              Expanded(
+                child: _DateField(
+                  label: l.endDate,
+                  date: state.endDate,
+                  onTap: () async {
+                    final firstSelectable = state.startDate ?? _todayDate();
+                    // For Vacation & Re Entry, the end date must fall
+                    // between the start date and the chosen re-entry date.
+                    final maxSelectable =
+                        state.selectedRequestType == RequestType.reEntry
+                            ? (state.reEntryDate ?? DateTime(2030))
+                            : DateTime(2030);
+                    final d = await showDatePicker(
+                      context: context,
+                      initialDate: state.endDate ?? firstSelectable,
+                      firstDate: firstSelectable,
+                      lastDate: maxSelectable,
+                      builder: (ctx, child) => _datePickerTheme(ctx, child),
+                    );
+                    if (d != null) cubit.selectEndDate(d);
+                  },
+                ),
+              ),
+            ],
           ),
+
+          if (state.startDate != null && state.endDate != null) ...[
+            SizedBox(height: context.sp(16)),
+            _DateSummaryCard(
+              startDate: state.startDate!,
+              endDate: state.endDate!,
+              leaveDays: state.leaveDays,
+              requestType: state.selectedRequestType,
+            ),
+          ],
         ],
 
         SizedBox(height: context.sp(20)),
@@ -371,6 +491,209 @@ class _RequestContent extends StatelessWidget {
         ),
       ),
       child: child!,
+    );
+  }
+}
+
+class _LeaveTypeField extends StatelessWidget {
+  final LeaveType? value;
+  final ValueChanged<LeaveType> onChanged;
+
+  const _LeaveTypeField({required this.value, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l.leaveType,
+          style: GoogleFonts.poppins(
+            fontSize: context.sp(12),
+            fontWeight: FontWeight.w600,
+            color: _kText,
+            letterSpacing: 0,
+          ),
+        ),
+        SizedBox(height: context.sp(6)),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: context.sp(12)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: _kGreen.withValues(alpha: 0.4),
+              width: 1.3,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<LeaveType>(
+              value: value,
+              isExpanded: true,
+              icon: Icon(Icons.keyboard_arrow_down,
+                  size: context.sp(18), color: _kDark),
+              hint: Text(
+                l.selectLeaveType,
+                style: GoogleFonts.poppins(
+                  fontSize: context.sp(12),
+                  fontWeight: FontWeight.w400,
+                  color: _kText.withValues(alpha: 0.35),
+                ),
+              ),
+              style: GoogleFonts.poppins(
+                fontSize: context.sp(12),
+                fontWeight: FontWeight.w400,
+                color: _kText,
+              ),
+              dropdownColor: Colors.white,
+              items: [
+                DropdownMenuItem(
+                  value: LeaveType.sick,
+                  child: Text(l.sickLeave),
+                ),
+                DropdownMenuItem(
+                  value: LeaveType.personal,
+                  child: Text(l.personalLeave),
+                ),
+              ],
+              onChanged: (v) {
+                if (v != null) onChanged(v);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Generic labeled dropdown — used by the Workwear Type / Size fields.
+class _LabeledDropdown<T> extends StatelessWidget {
+  final String label;
+  final String hint;
+  final T? value;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T> onChanged;
+
+  const _LabeledDropdown({
+    required this.label,
+    required this.hint,
+    required this.value,
+    required this.items,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: GoogleFonts.poppins(
+            fontSize: context.sp(12),
+            fontWeight: FontWeight.w600,
+            color: _kText,
+            letterSpacing: 0,
+          ),
+        ),
+        SizedBox(height: context.sp(6)),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: context.sp(12)),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: _kGreen.withValues(alpha: 0.4),
+              width: 1.3,
+            ),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<T>(
+              value: value,
+              isExpanded: true,
+              icon: Icon(Icons.keyboard_arrow_down,
+                  size: context.sp(18), color: _kDark),
+              hint: Text(
+                hint,
+                style: GoogleFonts.poppins(
+                  fontSize: context.sp(12),
+                  fontWeight: FontWeight.w400,
+                  color: _kText.withValues(alpha: 0.35),
+                ),
+              ),
+              style: GoogleFonts.poppins(
+                fontSize: context.sp(12),
+                fontWeight: FontWeight.w400,
+                color: _kText,
+              ),
+              dropdownColor: Colors.white,
+              items: items,
+              onChanged: (v) {
+                if (v != null) onChanged(v);
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _ShoeSizeField extends StatelessWidget {
+  final TextEditingController controller;
+
+  const _ShoeSizeField({required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l.shoeSize,
+          style: GoogleFonts.poppins(
+            fontSize: context.sp(12),
+            fontWeight: FontWeight.w600,
+            color: _kText,
+            letterSpacing: 0,
+          ),
+        ),
+        SizedBox(height: context.sp(6)),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(
+              color: _kGreen.withValues(alpha: 0.4),
+              width: 1.3,
+            ),
+          ),
+          child: TextField(
+            controller: controller,
+            keyboardType: TextInputType.number,
+            style: GoogleFonts.poppins(
+              fontSize: context.sp(13),
+              fontWeight: FontWeight.w400,
+              color: _kText,
+              letterSpacing: 0,
+            ),
+            decoration: InputDecoration(
+              hintText: l.enterShoeSize,
+              hintStyle: GoogleFonts.poppins(
+                fontSize: context.sp(13),
+                fontWeight: FontWeight.w400,
+                color: _kText.withValues(alpha: 0.35),
+                letterSpacing: 0,
+              ),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: context.sp(12),
+                vertical: context.sp(13),
+              ),
+              border: InputBorder.none,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
@@ -447,6 +770,195 @@ class _IssueContent extends StatelessWidget {
   }
 }
 
+// ── History Tab Content ───────────────────────────────────────────────────────
+
+enum _HistoryStatus { approved, pending, rejected }
+
+class _HistoryEntry {
+  final RequestType? requestType;
+  final IssueType? issueType;
+  final DateTime date;
+  final String detail;
+  final _HistoryStatus status;
+
+  const _HistoryEntry({
+    this.requestType,
+    this.issueType,
+    required this.date,
+    required this.detail,
+    required this.status,
+  });
+}
+
+// Dummy past submissions — API integration point — replace with real history
+final _dummyHistory = <_HistoryEntry>[
+  _HistoryEntry(
+    requestType: RequestType.leave,
+    date: DateTime(2026, 4, 10),
+    detail: '12 Apr 2026 — 14 Apr 2026',
+    status: _HistoryStatus.approved,
+  ),
+  _HistoryEntry(
+    issueType: IssueType.accommodation,
+    date: DateTime(2026, 3, 22),
+    detail: 'Room maintenance request',
+    status: _HistoryStatus.pending,
+  ),
+  _HistoryEntry(
+    requestType: RequestType.workwear,
+    date: DateTime(2026, 2, 15),
+    detail: 'Size L jacket replacement',
+    status: _HistoryStatus.rejected,
+  ),
+  _HistoryEntry(
+    requestType: RequestType.reEntry,
+    date: DateTime(2026, 1, 30),
+    detail: '05 Feb 2026 — 08 Feb 2026',
+    status: _HistoryStatus.approved,
+  ),
+];
+
+class _HistoryContent extends StatelessWidget {
+  const _HistoryContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+
+    if (_dummyHistory.isEmpty) {
+      return Padding(
+        padding: EdgeInsets.only(top: context.sp(40)),
+        child: Center(
+          child: Text(
+            l.noHistoryFound,
+            style: GoogleFonts.poppins(
+              fontSize: context.sp(13),
+              fontWeight: FontWeight.w500,
+              color: _kText.withValues(alpha: 0.35),
+              letterSpacing: 0,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final entry in _dummyHistory) ...[
+          _HistoryCard(entry: entry),
+          SizedBox(height: context.sp(12)),
+        ],
+      ],
+    );
+  }
+}
+
+class _HistoryCard extends StatelessWidget {
+  final _HistoryEntry entry;
+
+  const _HistoryCard({required this.entry});
+
+  String _title(AppLocalizations l) {
+    if (entry.requestType != null) {
+      return switch (entry.requestType!) {
+        RequestType.leave => l.leave,
+        RequestType.reEntry => l.reEntry,
+        RequestType.workwear => l.workwear,
+      };
+    }
+    return switch (entry.issueType!) {
+      IssueType.accommodation => l.accommodation,
+      IssueType.transport => l.transport,
+      IssueType.workingPlace => l.workingPlace,
+      IssueType.salary => l.salary,
+      IssueType.other => l.other,
+    };
+  }
+
+  (String, Color) _statusInfo(AppLocalizations l) => switch (entry.status) {
+        _HistoryStatus.approved => (l.approved, _kGreen),
+        _HistoryStatus.pending => (l.pending, _kAmber),
+        _HistoryStatus.rejected => (l.rejected, _kRed),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final (statusLabel, statusColor) = _statusInfo(l);
+
+    return Container(
+      padding: EdgeInsets.all(context.sp(14)),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: _kGreen.withValues(alpha: 0.25), width: 1),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  _title(l),
+                  style: GoogleFonts.poppins(
+                    fontSize: context.sp(13),
+                    fontWeight: FontWeight.w700,
+                    color: _kText,
+                    letterSpacing: 0,
+                  ),
+                ),
+                SizedBox(height: context.sp(4)),
+                Text(
+                  entry.detail,
+                  style: GoogleFonts.poppins(
+                    fontSize: context.sp(12),
+                    fontWeight: FontWeight.w400,
+                    color: _kText.withValues(alpha: 0.6),
+                    letterSpacing: 0,
+                  ),
+                ),
+                SizedBox(height: context.sp(6)),
+                Text(
+                  DateFormat('dd MMM yyyy', locale).format(entry.date),
+                  style: GoogleFonts.poppins(
+                    fontSize: context.sp(11),
+                    fontWeight: FontWeight.w400,
+                    color: _kText.withValues(alpha: 0.4),
+                    letterSpacing: 0,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: context.sp(10)),
+          Container(
+            padding: EdgeInsets.symmetric(
+              horizontal: context.sp(10),
+              vertical: context.sp(5),
+            ),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              statusLabel,
+              style: GoogleFonts.poppins(
+                fontSize: context.sp(10.5),
+                fontWeight: FontWeight.w600,
+                color: statusColor,
+                letterSpacing: 0,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ── Shared Widgets ────────────────────────────────────────────────────────────
 
 class _ChipGrid extends StatelessWidget {
@@ -489,7 +1001,11 @@ class _TypeChip extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
-        height: context.sp(44),
+        constraints: BoxConstraints(minHeight: context.sp(44)),
+        padding: EdgeInsets.symmetric(
+          horizontal: context.sp(8),
+          vertical: context.sp(6),
+        ),
         decoration: BoxDecoration(
           color: isSelected ? _kGreen : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
@@ -498,6 +1014,9 @@ class _TypeChip extends StatelessWidget {
         child: Center(
           child: Text(
             label,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
             style: GoogleFonts.poppins(
               fontSize: context.sp(12),
               fontWeight: FontWeight.w600,

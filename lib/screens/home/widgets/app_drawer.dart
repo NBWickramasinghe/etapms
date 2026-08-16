@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../bloc/locale/locale_cubit.dart';
 import '../../../core/responsive.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../models/profile_model.dart';
 import '../../change_password/change_password_screen.dart';
 import '../../language/language_screen.dart';
 import '../../login/login_screen.dart';
@@ -73,7 +74,7 @@ class AppDrawer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Dulaj',
+                          '${ProfileModel.dummy.surname} ${ProfileModel.dummy.otherName}',
                           style: GoogleFonts.poppins(
                             fontSize: context.sp(17),
                             fontWeight: FontWeight.w600,
@@ -84,7 +85,7 @@ class AppDrawer extends StatelessWidget {
                         ),
                         SizedBox(height: context.sp(3)),
                         Text(
-                          'HR Manager',
+                          ProfileModel.dummy.employeeNo,
                           style: GoogleFonts.poppins(
                             fontSize: context.sp(12),
                             fontWeight: FontWeight.w500,

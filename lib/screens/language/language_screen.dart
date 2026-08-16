@@ -5,7 +5,6 @@ import '../../bloc/locale/locale_cubit.dart';
 import '../../core/responsive.dart';
 import '../../l10n/app_localizations.dart';
 
-const _kDark  = Color(0xFF242F31);
 const _kGreen = Color(0xFF354E48);
 const _kText  = Color(0xFF191C21);
 const _kBg    = Color(0xFFF5F0E8);
@@ -47,15 +46,17 @@ class LanguageScreen extends StatelessWidget {
                   Align(
                     alignment: Alignment.centerLeft,
                     child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () => Navigator.of(context).pop(),
-                      child: Container(
+                      child: SizedBox(
                         width: context.sp(40),
                         height: context.sp(40),
-                        color: _kDark,
-                        child: Icon(
-                          Icons.arrow_back,
-                          color: Colors.white,
-                          size: context.sp(20),
+                        child: Center(
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: _kText,
+                            size: context.sp(20),
+                          ),
                         ),
                       ),
                     ),
