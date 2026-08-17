@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
+import 'package:pdfx/pdfx.dart';
 import '../../bloc/payslip/payslip_cubit.dart';
 import '../../bloc/payslip/payslip_state.dart';
 import '../../core/responsive.dart';
 import '../../l10n/app_localizations.dart';
+import 'widgets/payslip_pdf_full_view.dart';
 
 const _kDark = Color(0xFF242F31);
 const _kGreen = Color(0xFF354E48);
@@ -302,7 +304,11 @@ class _EmptyState extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Image.asset('assets/logo.png', width: context.wp(55)),
+          Icon(
+            Icons.receipt_long_outlined,
+            size: context.sp(56),
+            color: _kText.withValues(alpha: 0.25),
+          ),
           SizedBox(height: context.sp(24)),
           Text(
             'Select year and month\nto view your payslip',
@@ -328,8 +334,6 @@ class _PayslipCard extends StatelessWidget {
 
   const _PayslipCard({required this.data});
 
-  String _fmt(double v) => NumberFormat('#,##0', 'en').format(v);
-
   @override
   Widget build(BuildContext context) {
     final locale = Localizations.localeOf(context).languageCode;
@@ -349,9 +353,9 @@ class _PayslipCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // ── Section label ──────────────────────────────────
+          // ── Payslip document — tap to view large, scroll & zoom ─
           Text(
-            'Slip Found',
+            'Payslip Document',
             style: GoogleFonts.poppins(
               fontSize: context.sp(15),
               fontWeight: FontWeight.w700,
@@ -359,135 +363,11 @@ class _PayslipCard extends StatelessWidget {
               letterSpacing: 0,
             ),
           ),
-
           SizedBox(height: context.sp(12)),
-
-          // ── Main card ──────────────────────────────────────
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(context.sp(8)),
-              border: Border.all(
-                color: _kGreen.withValues(alpha: 0.18),
-                width: 1.2,
-              ),
-            ),
-            child: Column(
-              children: [
-                // Period + Paid status
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.sp(16),
-                    vertical: context.sp(14),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        '$monthName ${data.year}',
-                        style: GoogleFonts.poppins(
-                          fontSize: context.sp(15),
-                          fontWeight: FontWeight.w700,
-                          color: _kText,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                      const Spacer(),
-                      // ── Paid / Unpaid badge ──────────────
-                      Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: context.sp(10),
-                          vertical: context.sp(4),
-                        ),
-                        decoration: BoxDecoration(
-                          color: data.isPaid
-                              ? _kGreen.withValues(alpha: 0.12)
-                              : const Color(0xFFBF3847).withValues(alpha: 0.10),
-                          borderRadius: BorderRadius.circular(context.sp(20)),
-                          border: Border.all(
-                            color: data.isPaid
-                                ? _kGreen
-                                : const Color(0xFFBF3847),
-                            width: 1,
-                          ),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              data.isPaid ? Icons.check_circle : Icons.cancel,
-                              color: data.isPaid
-                                  ? _kGreen
-                                  : const Color(0xFFBF3847),
-                              size: context.sp(13),
-                            ),
-                            SizedBox(width: context.sp(4)),
-                            Text(
-                              data.isPaid ? 'Paid' : 'Unpaid',
-                              style: GoogleFonts.poppins(
-                                fontSize: context.sp(11),
-                                fontWeight: FontWeight.w600,
-                                color: data.isPaid
-                                    ? _kGreen
-                                    : const Color(0xFFBF3847),
-                                letterSpacing: 0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
-
-                // ── Salary rows ────────────────────────────
-                _CardRow(label: 'Basic Salary', value: _fmt(data.basicSalary)),
-                _CardRow(
-                  label: 'Allowances',
-                  value: _fmt(data.totalAllowances),
-                ),
-                _CardRow(
-                  label: 'Deductions',
-                  value: '- ${_fmt(data.totalDeductions)}',
-                  valueColor: const Color(0xFFBF3847),
-                  labelColor: const Color(0xFFBF3847),
-                ),
-
-                Divider(height: 1, thickness: 1, color: Colors.grey.shade200),
-
-                // ── Net salary ─────────────────────────────
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.sp(16),
-                    vertical: context.sp(14),
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'Net Salary',
-                        style: GoogleFonts.poppins(
-                          fontSize: context.sp(14),
-                          fontWeight: FontWeight.w700,
-                          color: _kText,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                      const Spacer(),
-                      Text(
-                        '${data.currency} ${_fmt(data.netSalary)}',
-                        style: GoogleFonts.poppins(
-                          fontSize: context.sp(15),
-                          fontWeight: FontWeight.w700,
-                          color: _kDark,
-                          letterSpacing: 0,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          _PayslipPdfPreview(
+            key: ValueKey(data.pdfAssetPath),
+            assetPath: data.pdfAssetPath,
+            title: '$monthName ${data.year}',
           ),
 
           SizedBox(height: context.sp(16)),
@@ -511,7 +391,14 @@ class _PayslipCard extends StatelessWidget {
                   icon: Icons.remove_red_eye_outlined,
                   label: 'View PDF',
                   color: _kGreen,
-                  onTap: () {}, // TODO: wire PDF viewer API
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => PayslipPdfFullView(
+                        assetPath: data.pdfAssetPath,
+                        title: '$monthName ${data.year}',
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -533,50 +420,116 @@ class _PayslipCard extends StatelessWidget {
   }
 }
 
-// ── Card salary row ───────────────────────────────────────────────────────────
+// ── Payslip PDF preview ─────────────────────────────────────────────────────────
 
-class _CardRow extends StatelessWidget {
-  final String label;
-  final String value;
-  final Color? labelColor;
-  final Color? valueColor;
+class _PayslipPdfPreview extends StatefulWidget {
+  final String assetPath;
+  final String title;
 
-  const _CardRow({
-    required this.label,
-    required this.value,
-    this.labelColor,
-    this.valueColor,
+  const _PayslipPdfPreview({
+    super.key,
+    required this.assetPath,
+    required this.title,
   });
 
   @override
+  State<_PayslipPdfPreview> createState() => _PayslipPdfPreviewState();
+}
+
+class _PayslipPdfPreviewState extends State<_PayslipPdfPreview> {
+  late final PdfController _controller = PdfController(
+    document: PdfDocument.openAsset(widget.assetPath),
+  );
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        horizontal: context.sp(16),
-        vertical: context.sp(12),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => PayslipPdfFullView(
+            assetPath: widget.assetPath,
+            title: widget.title,
+          ),
+        ),
       ),
-      child: Row(
-        children: [
-          Text(
-            label,
-            style: GoogleFonts.poppins(
-              fontSize: context.sp(13),
-              fontWeight: FontWeight.w400,
-              color: labelColor ?? _kText.withValues(alpha: 0.75),
-              letterSpacing: 0,
-            ),
+      child: Container(
+        height: context.hp(36),
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(context.sp(8)),
+          border: Border.all(
+            color: _kGreen.withValues(alpha: 0.18),
+            width: 1.2,
           ),
-          const Spacer(),
-          Text(
-            value,
-            style: GoogleFonts.poppins(
-              fontSize: context.sp(13),
-              fontWeight: FontWeight.w600,
-              color: valueColor ?? _kDark,
-              letterSpacing: 0,
+        ),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Preview only — tapping opens the scrollable, zoomable view.
+            AbsorbPointer(
+              child: PdfView(
+                controller: _controller,
+                scrollDirection: Axis.vertical,
+                builders: PdfViewBuilders<DefaultBuilderOptions>(
+                  options: const DefaultBuilderOptions(),
+                  documentLoaderBuilder: (_) =>
+                      const Center(child: CircularProgressIndicator()),
+                  pageLoaderBuilder: (_) =>
+                      const Center(child: CircularProgressIndicator()),
+                  errorBuilder: (_, _) => Center(
+                    child: Icon(
+                      Icons.error_outline,
+                      color: const Color(0xFFBF3847),
+                      size: context.sp(32),
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              right: context.sp(10),
+              bottom: context.sp(10),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.sp(10),
+                  vertical: context.sp(6),
+                ),
+                decoration: BoxDecoration(
+                  color: _kDark.withValues(alpha: 0.78),
+                  borderRadius: BorderRadius.circular(context.sp(20)),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.zoom_in,
+                      color: Colors.white,
+                      size: context.sp(14),
+                    ),
+                    SizedBox(width: context.sp(4)),
+                    Text(
+                      'Tap to enlarge',
+                      style: GoogleFonts.poppins(
+                        fontSize: context.sp(11),
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

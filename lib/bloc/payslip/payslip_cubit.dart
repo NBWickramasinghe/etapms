@@ -2,7 +2,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'payslip_state.dart';
 
 class PayslipCubit extends Cubit<PayslipState> {
-  PayslipCubit() : super(const PayslipState());
+  PayslipCubit() : super(const PayslipState()) {
+    // Default to the current year/month so a sample payslip is visible
+    // immediately, without the user having to open the filters first.
+    final now = DateTime.now();
+    selectYear(now.year);
+    selectMonth(now.month);
+    viewPayslip();
+  }
 
   void selectYear(int year) =>
       emit(state.copyWith(selectedYear: year, isViewing: false));

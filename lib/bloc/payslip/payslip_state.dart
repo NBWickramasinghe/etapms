@@ -45,6 +45,10 @@ class PayslipData {
   final double totalAllowances;
   final double totalDeductions;
   final double netSalary;
+  // Path to the actual payslip document for this year/month.
+  // TODO: once wired to the API this becomes a fetched/downloaded file
+  // (or a signed URL) per year/month instead of a bundled demo asset.
+  final String pdfAssetPath;
   // Detailed breakdown lists — populated by API later
   final List<PayslipRow> earningsDetail;
   final List<PayslipRow> deductionsDetail;
@@ -58,10 +62,14 @@ class PayslipData {
     required this.totalAllowances,
     required this.totalDeductions,
     required this.netSalary,
+    required this.pdfAssetPath,
     this.earningsDetail = const [],
     this.deductionsDetail = const [],
   });
 
+  // Dummy payslip — API integration point — replace with the employee's
+  // real payslip fetched for the selected year/month. For the demo, every
+  // year/month resolves to the same bundled PDF at assets/Documents/.
   static PayslipData dummy(int year, int month) => PayslipData(
         year: year,
         month: month,
@@ -71,6 +79,7 @@ class PayslipData {
         totalAllowances: 40000,
         totalDeductions: 30000,
         netSalary: 160000,
+        pdfAssetPath: 'assets/Documents/payslip.pdf',
         earningsDetail: const [
           PayslipRow('Basic Salary',        150000),
           PayslipRow('Housing Allowance',    25000),

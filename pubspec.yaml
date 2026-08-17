@@ -47,6 +47,7 @@ dependencies:
   flutter_map: ^8.3.1
   latlong2: ^0.10.1
   geocoding: ^5.0.0
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -76,6 +77,11 @@ flutter:
     - assets/payslip.png
     - assets/image.png
     - assets/Documents/
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/icon.png"
 
   # For details regarding adding assets from package dependencies, see
   # https://flutter.dev/to/asset-from-package

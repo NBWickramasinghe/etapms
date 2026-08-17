@@ -1,3 +1,6 @@
+import 'dart:math' as math;
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -779,6 +782,11 @@ class _HistoryEntry {
   final IssueType? issueType;
   final DateTime date;
   final String detail;
+  // Day count for leave requests only — null for everything else.
+  final int? leaveDays;
+  // The note the employee submitted with the request/issue — editable
+  // while the submission is still pending.
+  final String reason;
   final _HistoryStatus status;
 
   const _HistoryEntry({
@@ -786,9 +794,45 @@ class _HistoryEntry {
     this.issueType,
     required this.date,
     required this.detail,
+    this.leaveDays,
+    required this.reason,
     required this.status,
   });
+
+  _HistoryEntry copyWith({String? reason}) => _HistoryEntry(
+        requestType: requestType,
+        issueType: issueType,
+        date: date,
+        detail: detail,
+        leaveDays: leaveDays,
+        reason: reason ?? this.reason,
+        status: status,
+      );
 }
+
+String _historyTitle(AppLocalizations l, _HistoryEntry entry) {
+  if (entry.requestType != null) {
+    return switch (entry.requestType!) {
+      RequestType.leave => l.leave,
+      RequestType.reEntry => l.reEntry,
+      RequestType.workwear => l.workwear,
+    };
+  }
+  return switch (entry.issueType!) {
+    IssueType.accommodation => l.accommodation,
+    IssueType.transport => l.transport,
+    IssueType.workingPlace => l.workingPlace,
+    IssueType.salary => l.salary,
+    IssueType.other => l.other,
+  };
+}
+
+(String, Color) _historyStatusInfo(AppLocalizations l, _HistoryStatus status) =>
+    switch (status) {
+      _HistoryStatus.approved => (l.approved, _kGreen),
+      _HistoryStatus.pending => (l.pending, _kAmber),
+      _HistoryStatus.rejected => (l.rejected, _kRed),
+    };
 
 // Dummy past submissions — API integration point — replace with real history
 final _dummyHistory = <_HistoryEntry>[
@@ -796,36 +840,70 @@ final _dummyHistory = <_HistoryEntry>[
     requestType: RequestType.leave,
     date: DateTime(2026, 4, 10),
     detail: '12 Apr 2026 — 14 Apr 2026',
+    leaveDays: 3,
+    reason: 'Family function back home.',
     status: _HistoryStatus.approved,
   ),
   _HistoryEntry(
     issueType: IssueType.accommodation,
     date: DateTime(2026, 3, 22),
     detail: 'Room maintenance request',
+    reason: 'Bathroom tap has been leaking for two days.',
     status: _HistoryStatus.pending,
   ),
   _HistoryEntry(
     requestType: RequestType.workwear,
     date: DateTime(2026, 2, 15),
     detail: 'Size L jacket replacement',
+    reason: 'Current jacket zipper is broken.',
     status: _HistoryStatus.rejected,
   ),
   _HistoryEntry(
     requestType: RequestType.reEntry,
     date: DateTime(2026, 1, 30),
     detail: '05 Feb 2026 — 08 Feb 2026',
+    reason: 'Visa renewal appointment.',
     status: _HistoryStatus.approved,
   ),
 ];
 
-class _HistoryContent extends StatelessWidget {
+class _HistoryContent extends StatefulWidget {
   const _HistoryContent();
+
+  @override
+  State<_HistoryContent> createState() => _HistoryContentState();
+}
+
+class _HistoryContentState extends State<_HistoryContent> {
+  final _entries = List<_HistoryEntry>.of(_dummyHistory);
+
+  Future<void> _openDetail(int index) async {
+    final updated = await showGeneralDialog<_HistoryEntry>(
+      context: context,
+      barrierDismissible: true,
+      barrierLabel: 'Dismiss',
+      barrierColor: Colors.transparent,
+      transitionDuration: const Duration(milliseconds: 200),
+      transitionBuilder: (context, anim1, _, child) => FadeTransition(
+        opacity: CurvedAnimation(parent: anim1, curve: Curves.easeOut),
+        child: ScaleTransition(
+          scale: Tween<double>(begin: 0.94, end: 1.0).animate(
+            CurvedAnimation(parent: anim1, curve: Curves.easeOut),
+          ),
+          child: child,
+        ),
+      ),
+      pageBuilder: (context, _, _) =>
+          _HistoryDetailDialog(entry: _entries[index]),
+    );
+    if (updated != null) setState(() => _entries[index] = updated);
+  }
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
 
-    if (_dummyHistory.isEmpty) {
+    if (_entries.isEmpty) {
       return Padding(
         padding: EdgeInsets.only(top: context.sp(40)),
         child: Center(
@@ -845,8 +923,11 @@ class _HistoryContent extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        for (final entry in _dummyHistory) ...[
-          _HistoryCard(entry: entry),
+        for (int i = 0; i < _entries.length; i++) ...[
+          _HistoryCard(
+            entry: _entries[i],
+            onTap: () => _openDetail(i),
+          ),
           SizedBox(height: context.sp(12)),
         ],
       ],
@@ -856,104 +937,423 @@ class _HistoryContent extends StatelessWidget {
 
 class _HistoryCard extends StatelessWidget {
   final _HistoryEntry entry;
+  final VoidCallback onTap;
 
-  const _HistoryCard({required this.entry});
-
-  String _title(AppLocalizations l) {
-    if (entry.requestType != null) {
-      return switch (entry.requestType!) {
-        RequestType.leave => l.leave,
-        RequestType.reEntry => l.reEntry,
-        RequestType.workwear => l.workwear,
-      };
-    }
-    return switch (entry.issueType!) {
-      IssueType.accommodation => l.accommodation,
-      IssueType.transport => l.transport,
-      IssueType.workingPlace => l.workingPlace,
-      IssueType.salary => l.salary,
-      IssueType.other => l.other,
-    };
-  }
-
-  (String, Color) _statusInfo(AppLocalizations l) => switch (entry.status) {
-        _HistoryStatus.approved => (l.approved, _kGreen),
-        _HistoryStatus.pending => (l.pending, _kAmber),
-        _HistoryStatus.rejected => (l.rejected, _kRed),
-      };
+  const _HistoryCard({required this.entry, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context)!;
     final locale = Localizations.localeOf(context).languageCode;
-    final (statusLabel, statusColor) = _statusInfo(l);
+    final (statusLabel, statusColor) = _historyStatusInfo(l, entry.status);
+    final showDays =
+        entry.requestType == RequestType.leave && entry.leaveDays != null;
 
-    return Container(
-      padding: EdgeInsets.all(context.sp(14)),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: _kGreen.withValues(alpha: 0.25), width: 1),
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(context.sp(14)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          border:
+              Border.all(color: _kGreen.withValues(alpha: 0.25), width: 1),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _historyTitle(l, entry),
+                    style: GoogleFonts.poppins(
+                      fontSize: context.sp(13),
+                      fontWeight: FontWeight.w700,
+                      color: _kText,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  SizedBox(height: context.sp(4)),
+                  Text(
+                    showDays
+                        ? '${entry.detail}  ·  ${entry.leaveDays} ${l.days}'
+                        : entry.detail,
+                    style: GoogleFonts.poppins(
+                      fontSize: context.sp(12),
+                      fontWeight: FontWeight.w400,
+                      color: _kText.withValues(alpha: 0.6),
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  SizedBox(height: context.sp(6)),
+                  Text(
+                    DateFormat('dd MMM yyyy', locale).format(entry.date),
+                    style: GoogleFonts.poppins(
+                      fontSize: context.sp(11),
+                      fontWeight: FontWeight.w400,
+                      color: _kText.withValues(alpha: 0.4),
+                      letterSpacing: 0,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(width: context.sp(10)),
+            Container(
+              padding: EdgeInsets.symmetric(
+                horizontal: context.sp(10),
+                vertical: context.sp(5),
+              ),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                statusLabel,
+                style: GoogleFonts.poppins(
+                  fontSize: context.sp(10.5),
+                  fontWeight: FontWeight.w600,
+                  color: statusColor,
+                  letterSpacing: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+}
+
+// ── History detail dialog — view, and edit while pending ───────────────────────
+
+class _HistoryDetailDialog extends StatefulWidget {
+  final _HistoryEntry entry;
+
+  const _HistoryDetailDialog({required this.entry});
+
+  @override
+  State<_HistoryDetailDialog> createState() => _HistoryDetailDialogState();
+}
+
+class _HistoryDetailDialogState extends State<_HistoryDetailDialog> {
+  late bool _editing = false;
+  late final _reasonCtrl = TextEditingController(text: widget.entry.reason);
+
+  @override
+  void dispose() {
+    _reasonCtrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context)!;
+    final locale = Localizations.localeOf(context).languageCode;
+    final entry = widget.entry;
+    final (statusLabel, statusColor) = _historyStatusInfo(l, entry.status);
+    final showDays =
+        entry.requestType == RequestType.leave && entry.leaveDays != null;
+    // Editing is only offered while a submission is still pending.
+    // TODO: once wired to the API, also enforce the 24-hour edit window
+    // from the submission date — this demo skips that time check.
+    final canEdit = entry.status == _HistoryStatus.pending;
+    final screen = MediaQuery.sizeOf(context);
+
+    return BackdropFilter(
+      filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
+      child: Container(
+        color: Colors.black.withValues(alpha: 0.25),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxWidth: math.min(420.0, screen.width * 0.92),
+              maxHeight: screen.height * 0.86,
+            ),
+            child: Container(
+              // Give the scroll view a finite viewport. A max-height constraint
+              // alone lets its child be measured at an unbounded height.
+              height: screen.height * 0.86,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(context.sp(14)),
+              ),
+              padding: EdgeInsets.all(context.sp(20)),
+              child: SingleChildScrollView(
+                child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Header ──────────────────────────────────
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          _historyTitle(l, entry),
+                          style: GoogleFonts.poppins(
+                            fontSize: context.sp(16),
+                            fontWeight: FontWeight.w700,
+                            color: _kText,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Padding(
+                          padding: EdgeInsets.all(context.sp(4)),
+                          child: Icon(
+                            Icons.close,
+                            size: context.sp(20),
+                            color: const Color(0xFF6B7280),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: context.sp(12)),
+
+                  // ── Status badge ────────────────────────────
+                  Container(
+                    padding: EdgeInsets.symmetric(
+                      horizontal: context.sp(10),
+                      vertical: context.sp(5),
+                    ),
+                    decoration: BoxDecoration(
+                      color: statusColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      statusLabel,
+                      style: GoogleFonts.poppins(
+                        fontSize: context.sp(11),
+                        fontWeight: FontWeight.w600,
+                        color: statusColor,
+                        letterSpacing: 0,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: context.sp(16)),
+
+                  // ── Detail rows ─────────────────────────────
+                  _DetailRow(label: 'Detail', value: entry.detail),
+                  if (showDays)
+                    _DetailRow(
+                      label: 'Duration',
+                      value: '${entry.leaveDays} ${l.days}',
+                    ),
+                  _DetailRow(
+                    label: 'Submitted',
+                    value: DateFormat('dd MMM yyyy', locale).format(
+                      entry.date,
+                    ),
+                  ),
+
+                  SizedBox(height: context.sp(16)),
+                  Text(
+                    l.reasonOptional,
+                    style: GoogleFonts.poppins(
+                      fontSize: context.sp(12),
+                      fontWeight: FontWeight.w600,
+                      color: _kText,
+                      letterSpacing: 0,
+                    ),
+                  ),
+                  SizedBox(height: context.sp(6)),
+                  if (_editing)
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        border: Border.all(
+                          color: _kGreen.withValues(alpha: 0.4),
+                          width: 1.3,
+                        ),
+                      ),
+                      child: TextField(
+                        controller: _reasonCtrl,
+                        minLines: 3,
+                        maxLines: 5,
+                        autofocus: true,
+                        // Suppresses the platform's yellow spellcheck/
+                        // autocorrect underline under composed text.
+                        autocorrect: false,
+                        enableSuggestions: false,
+                        style: GoogleFonts.poppins(
+                          fontSize: context.sp(13),
+                          fontWeight: FontWeight.w400,
+                          color: _kText,
+                          letterSpacing: 0,
+                        ),
+                        decoration: InputDecoration(
+                          contentPadding: EdgeInsets.all(context.sp(12)),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                        ),
+                      ),
+                    )
+                  else
+                    Text(
+                      entry.reason.isEmpty ? '—' : entry.reason,
+                      style: GoogleFonts.poppins(
+                        fontSize: context.sp(13),
+                        fontWeight: FontWeight.w400,
+                        color: _kText.withValues(alpha: 0.7),
+                        letterSpacing: 0,
+                        height: 1.4,
+                      ),
+                    ),
+
+                  if (canEdit) ...[
+                    SizedBox(height: context.sp(20)),
+                    if (_editing)
+                      Row(
+                        children: [
+                          Expanded(
+                            child: _ActionButton(
+                              label: 'Cancel',
+                              isLoading: false,
+                              onTap: () => setState(() {
+                                _editing = false;
+                                _reasonCtrl.text = entry.reason;
+                              }),
+                            ),
+                          ),
+                          SizedBox(width: context.sp(10)),
+                          Expanded(
+                            child: _SaveButton(
+                              onTap: () => Navigator.of(context).pop(
+                                entry.copyWith(reason: _reasonCtrl.text),
+                              ),
+                            ),
+                          ),
+                        ],
+                      )
+                    else
+                      _EditButton(
+                        onTap: () => setState(() => _editing = true),
+                      ),
+                  ],
+                ],
+              ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _DetailRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.only(bottom: context.sp(8)),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  _title(l),
-                  style: GoogleFonts.poppins(
-                    fontSize: context.sp(13),
-                    fontWeight: FontWeight.w700,
-                    color: _kText,
-                    letterSpacing: 0,
-                  ),
-                ),
-                SizedBox(height: context.sp(4)),
-                Text(
-                  entry.detail,
-                  style: GoogleFonts.poppins(
-                    fontSize: context.sp(12),
-                    fontWeight: FontWeight.w400,
-                    color: _kText.withValues(alpha: 0.6),
-                    letterSpacing: 0,
-                  ),
-                ),
-                SizedBox(height: context.sp(6)),
-                Text(
-                  DateFormat('dd MMM yyyy', locale).format(entry.date),
-                  style: GoogleFonts.poppins(
-                    fontSize: context.sp(11),
-                    fontWeight: FontWeight.w400,
-                    color: _kText.withValues(alpha: 0.4),
-                    letterSpacing: 0,
-                  ),
-                ),
-              ],
+          SizedBox(
+            width: context.sp(84),
+            child: Text(
+              label,
+              style: GoogleFonts.poppins(
+                fontSize: context.sp(12),
+                fontWeight: FontWeight.w500,
+                color: _kText.withValues(alpha: 0.5),
+                letterSpacing: 0,
+              ),
             ),
           ),
-          SizedBox(width: context.sp(10)),
-          Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: context.sp(10),
-              vertical: context.sp(5),
-            ),
-            decoration: BoxDecoration(
-              color: statusColor.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(20),
-            ),
+          Expanded(
             child: Text(
-              statusLabel,
+              value,
               style: GoogleFonts.poppins(
-                fontSize: context.sp(10.5),
+                fontSize: context.sp(12.5),
                 fontWeight: FontWeight.w600,
-                color: statusColor,
+                color: _kText,
                 letterSpacing: 0,
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EditButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _EditButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        height: context.sp(46),
+        decoration: BoxDecoration(border: Border.all(color: _kGreen)),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.edit_outlined, color: _kGreen, size: context.sp(16)),
+              SizedBox(width: context.sp(6)),
+              Text(
+                'Edit',
+                style: GoogleFonts.poppins(
+                  fontSize: context.sp(13),
+                  fontWeight: FontWeight.w600,
+                  color: _kGreen,
+                  letterSpacing: 0,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _SaveButton extends StatelessWidget {
+  final VoidCallback onTap;
+
+  const _SaveButton({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        height: context.sp(46),
+        color: _kGreen,
+        child: Center(
+          child: Text(
+            'Save',
+            style: GoogleFonts.poppins(
+              fontSize: context.sp(13),
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+              letterSpacing: 0,
+            ),
+          ),
+        ),
       ),
     );
   }
