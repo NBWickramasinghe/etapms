@@ -165,7 +165,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get language => 'Language';
 
   @override
-  String get employeeLogging => 'Employee Logging';
+  String get employeeLogging => 'Employee Login';
 
   @override
   String get enterEmployeeId => 'Enter Worker /Employee ID';

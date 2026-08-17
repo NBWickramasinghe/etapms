@@ -165,7 +165,7 @@ class AppLocalizationsHi extends AppLocalizations {
   String get language => 'भाषा';
 
   @override
-  String get employeeLogging => 'Employee Logging';
+  String get employeeLogging => 'कर्मचारी लॉगिन';
 
   @override
   String get enterEmployeeId => 'श्रमिक/कर्मचारी ID दर्ज करें';

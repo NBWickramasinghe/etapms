@@ -1061,187 +1061,196 @@ class _HistoryDetailDialogState extends State<_HistoryDetailDialog> {
     // from the submission date — this demo skips that time check.
     final canEdit = entry.status == _HistoryStatus.pending;
     final screen = MediaQuery.sizeOf(context);
+    final keyboard = MediaQuery.viewInsetsOf(context).bottom;
+    // The room left over once the keyboard is up — so the dialog stays fully
+    // visible while the reason field is being edited.
+    final available = screen.height - keyboard;
 
     return BackdropFilter(
       filter: ImageFilter.blur(sigmaX: 6, sigmaY: 6),
       child: Container(
         color: Colors.black.withValues(alpha: 0.25),
+        padding: EdgeInsets.only(bottom: keyboard),
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: math.min(420.0, screen.width * 0.92),
-              maxHeight: screen.height * 0.86,
+              maxHeight: available * 0.86,
             ),
             child: Container(
-              // Give the scroll view a finite viewport. A max-height constraint
-              // alone lets its child be measured at an unbounded height.
-              height: screen.height * 0.86,
+              // No explicit height: the scroll view shrink-wraps its content,
+              // so short entries get a short dialog. It only starts scrolling
+              // once the content exceeds the max height above.
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(context.sp(14)),
               ),
               padding: EdgeInsets.all(context.sp(20)),
-              child: SingleChildScrollView(
-                child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ── Header ──────────────────────────────────
-                  Row(
+              // showGeneralDialog builds a route with no Material in it,
+              // unlike showDialog. Without a Material ancestor, Text falls
+              // back to Flutter's debug style — black with a double yellow
+              // underline — and TextField loses its ink surface. Paint
+              // nothing here; the white background above already does.
+              child: Material(
+                type: MaterialType.transparency,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Expanded(
-                        child: Text(
-                          _historyTitle(l, entry),
-                          style: GoogleFonts.poppins(
-                            fontSize: context.sp(16),
-                            fontWeight: FontWeight.w700,
-                            color: _kText,
-                            letterSpacing: 0,
-                          ),
-                        ),
-                      ),
-                      GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Padding(
-                          padding: EdgeInsets.all(context.sp(4)),
-                          child: Icon(
-                            Icons.close,
-                            size: context.sp(20),
-                            color: const Color(0xFF6B7280),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: context.sp(12)),
-
-                  // ── Status badge ────────────────────────────
-                  Container(
-                    padding: EdgeInsets.symmetric(
-                      horizontal: context.sp(10),
-                      vertical: context.sp(5),
-                    ),
-                    decoration: BoxDecoration(
-                      color: statusColor.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      statusLabel,
-                      style: GoogleFonts.poppins(
-                        fontSize: context.sp(11),
-                        fontWeight: FontWeight.w600,
-                        color: statusColor,
-                        letterSpacing: 0,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: context.sp(16)),
-
-                  // ── Detail rows ─────────────────────────────
-                  _DetailRow(label: 'Detail', value: entry.detail),
-                  if (showDays)
-                    _DetailRow(
-                      label: 'Duration',
-                      value: '${entry.leaveDays} ${l.days}',
-                    ),
-                  _DetailRow(
-                    label: 'Submitted',
-                    value: DateFormat('dd MMM yyyy', locale).format(
-                      entry.date,
-                    ),
-                  ),
-
-                  SizedBox(height: context.sp(16)),
-                  Text(
-                    l.reasonOptional,
-                    style: GoogleFonts.poppins(
-                      fontSize: context.sp(12),
-                      fontWeight: FontWeight.w600,
-                      color: _kText,
-                      letterSpacing: 0,
-                    ),
-                  ),
-                  SizedBox(height: context.sp(6)),
-                  if (_editing)
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(
-                          color: _kGreen.withValues(alpha: 0.4),
-                          width: 1.3,
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _reasonCtrl,
-                        minLines: 3,
-                        maxLines: 5,
-                        autofocus: true,
-                        // Suppresses the platform's yellow spellcheck/
-                        // autocorrect underline under composed text.
-                        autocorrect: false,
-                        enableSuggestions: false,
-                        style: GoogleFonts.poppins(
-                          fontSize: context.sp(13),
-                          fontWeight: FontWeight.w400,
-                          color: _kText,
-                          letterSpacing: 0,
-                        ),
-                        decoration: InputDecoration(
-                          contentPadding: EdgeInsets.all(context.sp(12)),
-                          border: InputBorder.none,
-                          enabledBorder: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          disabledBorder: InputBorder.none,
-                          errorBorder: InputBorder.none,
-                          focusedErrorBorder: InputBorder.none,
-                        ),
-                      ),
-                    )
-                  else
-                    Text(
-                      entry.reason.isEmpty ? '—' : entry.reason,
-                      style: GoogleFonts.poppins(
-                        fontSize: context.sp(13),
-                        fontWeight: FontWeight.w400,
-                        color: _kText.withValues(alpha: 0.7),
-                        letterSpacing: 0,
-                        height: 1.4,
-                      ),
-                    ),
-
-                  if (canEdit) ...[
-                    SizedBox(height: context.sp(20)),
-                    if (_editing)
+                      // ── Header ──────────────────────────────────
                       Row(
                         children: [
                           Expanded(
-                            child: _ActionButton(
-                              label: 'Cancel',
-                              isLoading: false,
-                              onTap: () => setState(() {
-                                _editing = false;
-                                _reasonCtrl.text = entry.reason;
-                              }),
+                            child: Text(
+                              _historyTitle(l, entry),
+                              style: GoogleFonts.poppins(
+                                fontSize: context.sp(16),
+                                fontWeight: FontWeight.w700,
+                                color: _kText,
+                                letterSpacing: 0,
+                              ),
                             ),
                           ),
-                          SizedBox(width: context.sp(10)),
-                          Expanded(
-                            child: _SaveButton(
-                              onTap: () => Navigator.of(context).pop(
-                                entry.copyWith(reason: _reasonCtrl.text),
+                          GestureDetector(
+                            behavior: HitTestBehavior.opaque,
+                            onTap: () => Navigator.of(context).pop(),
+                            child: Padding(
+                              padding: EdgeInsets.all(context.sp(4)),
+                              child: Icon(
+                                Icons.close,
+                                size: context.sp(20),
+                                color: const Color(0xFF6B7280),
                               ),
                             ),
                           ),
                         ],
-                      )
-                    else
-                      _EditButton(
-                        onTap: () => setState(() => _editing = true),
                       ),
-                  ],
-                ],
-              ),
+                      SizedBox(height: context.sp(12)),
+
+                      // ── Status badge ────────────────────────────
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: context.sp(10),
+                          vertical: context.sp(5),
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(
+                          statusLabel,
+                          style: GoogleFonts.poppins(
+                            fontSize: context.sp(11),
+                            fontWeight: FontWeight.w600,
+                            color: statusColor,
+                            letterSpacing: 0,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: context.sp(16)),
+
+                      // ── Detail rows ─────────────────────────────
+                      _DetailRow(label: 'Detail', value: entry.detail),
+                      if (showDays)
+                        _DetailRow(
+                          label: 'Duration',
+                          value: '${entry.leaveDays} ${l.days}',
+                        ),
+                      _DetailRow(
+                        label: 'Submitted',
+                        value: DateFormat('dd MMM yyyy', locale).format(
+                          entry.date,
+                        ),
+                      ),
+
+                      SizedBox(height: context.sp(16)),
+                      Text(
+                        l.reasonOptional,
+                        style: GoogleFonts.poppins(
+                          fontSize: context.sp(12),
+                          fontWeight: FontWeight.w600,
+                          color: _kText,
+                          letterSpacing: 0,
+                        ),
+                      ),
+                      SizedBox(height: context.sp(6)),
+                      if (_editing)
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            border: Border.all(
+                              color: _kGreen.withValues(alpha: 0.4),
+                              width: 1.3,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _reasonCtrl,
+                            minLines: 3,
+                            maxLines: 5,
+                            autofocus: true,
+                            style: GoogleFonts.poppins(
+                              fontSize: context.sp(13),
+                              fontWeight: FontWeight.w400,
+                              color: _kText,
+                              letterSpacing: 0,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding: EdgeInsets.all(context.sp(12)),
+                              border: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              focusedErrorBorder: InputBorder.none,
+                            ),
+                          ),
+                        )
+                      else
+                        Text(
+                          entry.reason.isEmpty ? '—' : entry.reason,
+                          style: GoogleFonts.poppins(
+                            fontSize: context.sp(13),
+                            fontWeight: FontWeight.w400,
+                            color: _kText.withValues(alpha: 0.7),
+                            letterSpacing: 0,
+                            height: 1.4,
+                          ),
+                        ),
+
+                      if (canEdit) ...[
+                        SizedBox(height: context.sp(20)),
+                        if (_editing)
+                          Row(
+                            children: [
+                              Expanded(
+                                child: _ActionButton(
+                                  label: 'Cancel',
+                                  isLoading: false,
+                                  onTap: () => setState(() {
+                                    _editing = false;
+                                    _reasonCtrl.text = entry.reason;
+                                  }),
+                                ),
+                              ),
+                              SizedBox(width: context.sp(10)),
+                              Expanded(
+                                child: _SaveButton(
+                                  onTap: () => Navigator.of(context).pop(
+                                    entry.copyWith(reason: _reasonCtrl.text),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          )
+                        else
+                          _EditButton(
+                            onTap: () => setState(() => _editing = true),
+                          ),
+                      ],
+                    ],
+                  ),
+                ),
               ),
             ),
           ),

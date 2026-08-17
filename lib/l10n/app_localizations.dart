@@ -423,7 +423,7 @@ abstract class AppLocalizations {
   /// No description provided for @employeeLogging.
   ///
   /// In en, this message translates to:
-  /// **'Employee Logging'**
+  /// **'Employee Login'**
   String get employeeLogging;
 
   /// No description provided for @enterEmployeeId.
