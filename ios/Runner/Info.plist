@@ -38,6 +38,8 @@
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ETAPMS uses your location to show your current position on the home screen.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ETAPMS uses your location to show your current position on the home screen.</string>
 	<key>UIApplicationSceneManifest</key>
